@@ -9,7 +9,7 @@ import br.com.dftech.dal.Moduloconexao;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
-public class TelaUsuario extends javax.swing.JInternalFrame {
+public class TelaUsuario extends javax.swing.JInternalFrame{
 
     Connection conexao = null;
     PreparedStatement pst = null;
@@ -222,7 +222,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel7.setText("* ID");
 
-        jLabel1.setText("*campos obrigatórios");
+        jLabel1.setText("* campos obrigatórios");
 
         try {
             txtUsuFone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(##) #####-####")));

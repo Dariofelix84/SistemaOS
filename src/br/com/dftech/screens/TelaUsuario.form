@@ -288,7 +288,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="*campos obrigat&#xf3;rios"/>
+        <Property name="text" type="java.lang.String" value="* campos obrigat&#xf3;rios"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="txtUsuFone">

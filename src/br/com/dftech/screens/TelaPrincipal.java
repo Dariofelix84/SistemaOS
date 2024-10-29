@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
  *
  * @author dario
  */
-public class TelaPrincipal extends javax.swing.JFrame {
+public class TelaPrincipal extends javax.swing.JFrame{
 
     /**
      * Creates new form TelaPrincipal
@@ -79,7 +79,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             .addGap(0, 480, Short.MAX_VALUE)
         );
 
-        lblUsuario.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        lblUsuario.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblUsuario.setText("Usuário");
 
         lblData.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N

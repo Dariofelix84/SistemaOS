@@ -8,7 +8,7 @@ package br.com.dftech.screens;
  *
  * @author dario
  */
-public class TelaSobre extends javax.swing.JFrame {
+public class TelaSobre extends javax.swing.JFrame{
 
     /**
      * Creates new form TelaSobre
@@ -53,12 +53,9 @@ public class TelaSobre extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(123, 123, 123))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel4)
                         .addGap(40, 40, 40))
                     .addGroup(layout.createSequentialGroup()
@@ -77,10 +74,10 @@ public class TelaSobre extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3))
                     .addComponent(jLabel4))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
-        setSize(new java.awt.Dimension(361, 221));
+        setSize(new java.awt.Dimension(361, 216));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

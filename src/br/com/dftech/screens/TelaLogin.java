@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
-public class TelaLogin extends javax.swing.JFrame {
+public class TelaLogin extends javax.swing.JFrame{
 
     Connection conexao = null;
     PreparedStatement pst = null;
@@ -166,10 +166,10 @@ public class TelaLogin extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnLogin))
-                .addGap(0, 59, Short.MAX_VALUE))
+                .addGap(0, 56, Short.MAX_VALUE))
         );
 
-        setSize(new java.awt.Dimension(376, 190));
+        setSize(new java.awt.Dimension(376, 187));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

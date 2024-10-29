@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
-public class TelaCliente extends javax.swing.JInternalFrame {
+public class TelaCliente extends javax.swing.JInternalFrame{
 
     Connection conexao = null;
     PreparedStatement pst = null;

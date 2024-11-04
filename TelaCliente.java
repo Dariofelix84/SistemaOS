@@ -415,7 +415,6 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 btnCliAlterar.setEnabled(false);
                 btnCliRemover.setEnabled(false);
             }
-
         }
 
     }//GEN-LAST:event_txtCliPesquisarKeyPressed

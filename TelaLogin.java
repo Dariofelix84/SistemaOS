@@ -17,7 +17,6 @@ public class TelaLogin extends javax.swing.JFrame{
     ResultSet rs = null;
 
     
-    
     public void logar() {
         String sql = "select * from tbusuarios where login=? and senha=?";
         try {

@@ -221,6 +221,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
             TelaOS os = new TelaOS();
             os.setVisible(true);
             desktop.add(os);
+            TelaOS.txtCliPesquisar.requestFocus();
             
     }//GEN-LAST:event_menCadOSActionPerformed
 

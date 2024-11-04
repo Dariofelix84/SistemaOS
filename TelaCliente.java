@@ -43,7 +43,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException e){
             JOptionPane.showMessageDialog(null, e);
         }
     }

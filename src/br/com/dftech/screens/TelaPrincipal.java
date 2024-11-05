@@ -79,10 +79,10 @@ public class TelaPrincipal extends javax.swing.JFrame{
             .addGap(0, 480, Short.MAX_VALUE)
         );
 
-        lblUsuario.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lblUsuario.setFont(new java.awt.Font("Tahoma", 1, 22)); // NOI18N
         lblUsuario.setText("Usuário");
 
-        lblData.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
+        lblData.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblData.setText("Data");
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png"))); // NOI18N
@@ -221,6 +221,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
             TelaOS os = new TelaOS();
             os.setVisible(true);
             desktop.add(os);
+            TelaOS.txtCliPesquisar.requestFocus();
             
     }//GEN-LAST:event_menCadOSActionPerformed
 
@@ -244,7 +245,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
     private void menOpcSaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menOpcSaiActionPerformed
         int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair?", "Atenção", JOptionPane.YES_NO_OPTION);
-        if (sair == JOptionPane.YES_OPTION) {
+        if (sair == JOptionPane.YES_OPTION){
             System.exit(0);
         }
     }//GEN-LAST:event_menOpcSaiActionPerformed

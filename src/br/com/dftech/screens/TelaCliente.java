@@ -43,7 +43,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException e){
             JOptionPane.showMessageDialog(null, e);
         }
     }
@@ -123,6 +123,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 if (apagado > 0) {
                     JOptionPane.showMessageDialog(null, "Cliente removido com sucesso");
                     limpar();
+                    btnCliAdicionar.setEnabled(true);
                 }
 
             } catch (Exception e) {
@@ -399,6 +400,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
     private void tblClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientesMouseClicked
         setarCampo();
+        btnCliAlterar.setEnabled(true);
+        btnCliRemover.setEnabled(true);
     }//GEN-LAST:event_tblClientesMouseClicked
 
     private void txtCliPesquisarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCliPesquisarKeyPressed
@@ -408,10 +411,10 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             if (tblClientes.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(null, "Cliente não cadastrado!");
                 txtCliNome.requestFocus();
+                btnCliAdicionar.setEnabled(true);
                 btnCliAlterar.setEnabled(false);
                 btnCliRemover.setEnabled(false);
             }
-
         }
 
     }//GEN-LAST:event_txtCliPesquisarKeyPressed
@@ -419,6 +422,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private void tblClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblClientesKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             setarCampo();
+            btnCliAlterar.setEnabled(true);
+            btnCliRemover.setEnabled(true);
         }
     }//GEN-LAST:event_tblClientesKeyPressed
 

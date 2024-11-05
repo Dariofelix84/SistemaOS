@@ -122,6 +122,32 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
         } catch (Exception e) {
         }
     }
+    
+     private void remover() {
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover esse usuário?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            String sql = "delete from tbusuarios where iduser=?";
+            try {
+                int userId = Integer.parseInt(txtUsuId.getText());
+                pst = conexao.prepareStatement(sql);
+                pst.setInt(1, userId);
+                int apagado = pst.executeUpdate();
+                if (apagado > 0) {
+                    JOptionPane.showMessageDialog(null, "Usuário removido com sucesso");
+                    txtUsuNome.setText(null);
+                    txtUsuFone.setText(null);
+                    txtUsuLogin.setText(null);
+                    txtUsuSenha.setText(null);
+                    txtUsuId.requestFocus();
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+
+        }
+
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -188,6 +214,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
                 btnUsuCreateActionPerformed(evt);
             }
         });
+        btnUsuCreate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnUsuCreateKeyPressed(evt);
+            }
+        });
 
         btnUsuConsulta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/read.png"))); // NOI18N
         btnUsuConsulta.setToolTipText("Consultar");
@@ -196,6 +227,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
         btnUsuConsulta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUsuConsultaActionPerformed(evt);
+            }
+        });
+        btnUsuConsulta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnUsuConsultaKeyPressed(evt);
             }
         });
 
@@ -208,6 +244,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
                 btnUsuUpdateActionPerformed(evt);
             }
         });
+        btnUsuUpdate.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnUsuUpdateKeyPressed(evt);
+            }
+        });
 
         btnUsuDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/delete.png"))); // NOI18N
         btnUsuDelete.setToolTipText("Remover");
@@ -216,6 +257,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
         btnUsuDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUsuDeleteActionPerformed(evt);
+            }
+        });
+        btnUsuDelete.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnUsuDeleteKeyPressed(evt);
             }
         });
 
@@ -323,7 +369,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUsuDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuDeleteActionPerformed
-        // TODO add your handling code here:
+        remover();
     }//GEN-LAST:event_btnUsuDeleteActionPerformed
 
     private void btnUsuConsultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuConsultaActionPerformed
@@ -345,6 +391,30 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
        
         
     }//GEN-LAST:event_txtUsuIdKeyPressed
+
+    private void btnUsuCreateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnUsuCreateKeyPressed
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            adicionar();
+        }
+    }//GEN-LAST:event_btnUsuCreateKeyPressed
+
+    private void btnUsuConsultaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnUsuConsultaKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            consultar();
+        }
+    }//GEN-LAST:event_btnUsuConsultaKeyPressed
+
+    private void btnUsuUpdateKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnUsuUpdateKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            alterar();
+        }
+    }//GEN-LAST:event_btnUsuUpdateKeyPressed
+
+    private void btnUsuDeleteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnUsuDeleteKeyPressed
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+           
+        }
+    }//GEN-LAST:event_btnUsuDeleteKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

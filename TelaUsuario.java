@@ -8,6 +8,7 @@ import java.sql.*;
 import br.com.dftech.dal.Moduloconexao;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class TelaUsuario extends javax.swing.JInternalFrame{
 
@@ -21,6 +22,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
     public TelaUsuario() {
         initComponents();
         conexao = Moduloconexao.conector();
+        txtUsuId.setHorizontalAlignment(JTextField.CENTER);
     }
 
     private void consultar() {
@@ -39,6 +41,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
                 txtUsuSenha.setText(rs.getString(5));
                 cboUsuPerfil.setSelectedItem(rs.getString(6));
                 txtUsuId.requestFocus();
+                btnUsuCreate.setEnabled(false);
 
             } else {
                 JOptionPane.showMessageDialog(null, "Usuário não cadastrado");
@@ -48,6 +51,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame{
                 txtUsuSenha.setText(null);
                 // cboUsuPerfil.setSelectedItem(null);
                 txtUsuNome.requestFocus();
+                btnUsuCreate.setEnabled(true);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);

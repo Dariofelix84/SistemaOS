@@ -4,21 +4,30 @@
  */
 package br.com.dftech.screens;
 
+import br.com.dftech.dal.Moduloconexao;
 import java.text.DateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import java.sql.*;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author dario
  */
-public class TelaPrincipal extends javax.swing.JFrame{
+
+public class TelaPrincipal extends javax.swing.JFrame {
+    Connection conexao = null;
 
     /**
      * Creates new form TelaPrincipal
      */
     public TelaPrincipal() {
         initComponents();
+        conexao = Moduloconexao.conector();
+   
     }
 
     /**
@@ -42,6 +51,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         menCadOS = new javax.swing.JMenuItem();
         menCadUsu = new javax.swing.JMenuItem();
         menRel = new javax.swing.JMenu();
+        menRelCli = new javax.swing.JMenuItem();
         menRelSer = new javax.swing.JMenuItem();
         menAju = new javax.swing.JMenu();
         menAjuSob = new javax.swing.JMenuItem();
@@ -126,6 +136,20 @@ public class TelaPrincipal extends javax.swing.JFrame{
 
         menRel.setText("Relatório");
         menRel.setEnabled(false);
+        menRel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menRelActionPerformed(evt);
+            }
+        });
+
+        menRelCli.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        menRelCli.setText("Clientes");
+        menRelCli.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menRelCliActionPerformed(evt);
+            }
+        });
+        menRel.add(menRelCli);
 
         menRelSer.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_DOWN_MASK));
         menRelSer.setText("Serviços");
@@ -218,11 +242,11 @@ public class TelaPrincipal extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void menCadOSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadOSActionPerformed
-            TelaOS os = new TelaOS();
-            os.setVisible(true);
-            desktop.add(os);
-            TelaOS.txtCliPesquisar.requestFocus();
-            
+        TelaOS os = new TelaOS();
+        os.setVisible(true);
+        desktop.add(os);
+        TelaOS.txtCliPesquisar.requestFocus();
+
     }//GEN-LAST:event_menCadOSActionPerformed
 
     private void menRelSerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menRelSerActionPerformed
@@ -234,7 +258,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
         cliente.setVisible(true);
         desktop.add(cliente);
         TelaCliente.txtCliPesquisar.requestFocus();
-        
+
     }//GEN-LAST:event_menCadCliActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -264,48 +288,64 @@ public class TelaPrincipal extends javax.swing.JFrame{
         usuario.setVisible(true);
         desktop.add(usuario);
         TelaUsuario.txtUsuId.requestFocus();
-        
-        
+
+
     }//GEN-LAST:event_menCadUsuActionPerformed
 
     private void menCadUseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadUseActionPerformed
-       
+
     }//GEN-LAST:event_menCadUseActionPerformed
+
+    private void menRelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menRelActionPerformed
+       
+    }//GEN-LAST:event_menRelActionPerformed
+
+    private void menRelCliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menRelCliActionPerformed
+        int confirma = JOptionPane.showConfirmDialog(null, "Corfirma a emissão deste relatório","Atenção",JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            try {
+                JasperPrint print = JasperFillManager.fillReport("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_clientes\\relatorio_clientes.jasper",null, conexao);
+                JasperViewer.viewReport(print, false);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }//GEN-LAST:event_menRelCliActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+     */
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaPrincipal().setVisible(true);
-            }
-        });
+    } catch (ClassNotFoundException ex) {
+        java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+        java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+        java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(TelaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+    //</editor-fold>
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            new TelaPrincipal().setVisible(true);
+        }
+    });
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar Menu;
@@ -324,6 +364,7 @@ public class TelaPrincipal extends javax.swing.JFrame{
     private javax.swing.JMenu menOpc;
     private javax.swing.JMenuItem menOpcSai;
     public static javax.swing.JMenu menRel;
+    private javax.swing.JMenuItem menRelCli;
     private javax.swing.JMenuItem menRelSer;
     // End of variables declaration//GEN-END:variables
 }

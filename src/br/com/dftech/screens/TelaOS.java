@@ -7,11 +7,22 @@ package br.com.dftech.screens;
 import java.sql.*;
 import br.com.dftech.dal.Moduloconexao;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 //import javax.swing.SwingConstants;
 import net.proteanit.sql.DbUtils;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+import java.awt.print.Printable;
+import java.awt.print.PrinterJob;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Font;
 
 public class TelaOS extends javax.swing.JInternalFrame {
 
@@ -51,29 +62,48 @@ public class TelaOS extends javax.swing.JInternalFrame {
     private void emitir_os() {
         String sql = "insert into tbos (equipamento, defeito, servico, tecnico, valor, id_cliente, tipo, situacao) values(?,?,?,?,?,?,?,?)";
         try {
+            if ((txtCliId.getText().isEmpty()) || (txtOsEquip.getText().isEmpty()) || (txtOsDef.getText().isEmpty())) {
+                JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios (*)");
+                return;
+            }
+            int cliId;
+            try {
+                cliId = Integer.parseInt(txtCliId.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "ID do cliente inválido!");
+                return;
+            }
+            double valor = 0.0;
+            if (!txtOsValor.getText().trim().isEmpty()) {
+                try {
+                    valor = Double.parseDouble(txtOsValor.getText().replace(",", "."));
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Valor da OS inválido!");
+                    return;
+                }
+            }
+
             pst = conexao.prepareStatement(sql);
-            pst.setString(7, tipo);
-            pst.setString(8, cboOsSit.getSelectedItem().toString());
             pst.setString(1, txtOsEquip.getText());
             pst.setString(2, txtOsDef.getText());
             pst.setString(3, txtOsServ.getText());
             pst.setString(4, txtOsTec.getText());
-            pst.setDouble(5, Double.parseDouble(txtOsValor.getText()));
-            pst.setInt(6, Integer.parseInt(txtCliId.getText()));
+            pst.setDouble(5, valor);
+            pst.setInt(6, cliId);
+            pst.setString(7, tipo);
+            pst.setString(8, cboOsSit.getSelectedItem().toString());
 
-            if ((txtCliId.getText().isEmpty()) || (txtOsEquip.getText().isEmpty()) || (txtOsDef.getText().isEmpty())) {
-                JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
-            } else {
-                int adicionado = pst.executeUpdate();
-                if (adicionado > 0) {
-                    JOptionPane.showMessageDialog(null, "OS emitida com sucesso");
-                    txtCliId.setText(null);
-                    txtOsEquip.setText(null);
-                    txtOsDef.setText(null);
-                    txtOsServ.setText(null);
-                    txtOsTec.setText(null);
-                    txtOsValor.setText(null);
-                }
+            int adicionado = pst.executeUpdate();
+            if (adicionado > 0) {
+                JOptionPane.showMessageDialog(null, "OS emitida com sucesso");
+                txtCliId.setText(null);
+                txtOsEquip.setText(null);
+                txtOsDef.setText(null);
+                txtOsServ.setText(null);
+                txtOsTec.setText(null);
+                txtOsValor.setText(null);
+                txtOs.setText(null);
+                txtData.setText(null);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -82,9 +112,13 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
     private void pesquisar_os() {
         String num_os = JOptionPane.showInputDialog("Número da OS");
-        String sql = "select * from tbos where os = " + num_os;
+        if (num_os == null || num_os.trim().isEmpty()) {
+            return;
+        }
+        String sql = "select * from tbos where os = ?";
         try {
             pst = conexao.prepareStatement(sql);
+            pst.setInt(1, Integer.parseInt(num_os.trim()));
             rs = pst.executeQuery();
             if (rs.next()) {
                 txtOs.setText(rs.getString(1));
@@ -111,15 +145,38 @@ public class TelaOS extends javax.swing.JInternalFrame {
             } else {
                 JOptionPane.showMessageDialog(null, "OS não cadastrada");
             }
-        } catch (org.postgresql.util.PSQLException e) {
-            JOptionPane.showMessageDialog(null, "OS Inválida");
-            // System.out.println(e);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Número de OS inválido!");
         } catch (Exception e2) {
             JOptionPane.showMessageDialog(null, e2);
         }
     }
 
     private void alterar_os() {
+        if (txtOs.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nenhuma OS carregada para alterar!");
+            return;
+        }
+        if ((txtCliId.getText().isEmpty()) || (txtOsEquip.getText().isEmpty()) || (txtOsDef.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios (*)");
+            return;
+        }
+        int osNum;
+        try {
+            osNum = Integer.parseInt(txtOs.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Número da OS inválido!");
+            return;
+        }
+        double valor = 0.0;
+        if (!txtOsValor.getText().trim().isEmpty()) {
+            try {
+                valor = Double.parseDouble(txtOsValor.getText().replace(",", "."));
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Valor da OS inválido!");
+                return;
+            }
+        }
         String sql = "update tbos set equipamento=?, defeito=?, servico=?, tecnico=?, valor=?, tipo=?, situacao=? where os=?";
         try {
             pst = conexao.prepareStatement(sql);
@@ -127,17 +184,54 @@ public class TelaOS extends javax.swing.JInternalFrame {
             pst.setString(2, txtOsDef.getText());
             pst.setString(3, txtOsServ.getText());
             pst.setString(4, txtOsTec.getText());
-            pst.setDouble(5, Double.parseDouble(txtOsValor.getText()));
+            pst.setDouble(5, valor);
             pst.setString(6, tipo);
             pst.setString(7, cboOsSit.getSelectedItem().toString());
-            pst.setInt(8, Integer.parseInt(txtOs.getText()));
+            pst.setInt(8, osNum);
 
-            if ((txtCliId.getText().isEmpty()) || (txtOsEquip.getText().isEmpty()) || (txtOsDef.getText().isEmpty())) {
-                JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
-            } else {
-                int adicionado = pst.executeUpdate();
-                if (adicionado > 0) {
-                    JOptionPane.showMessageDialog(null, "OS alterada com sucesso");
+            int adicionado = pst.executeUpdate();
+            if (adicionado > 0) {
+                JOptionPane.showMessageDialog(null, "OS alterada com sucesso");
+                txtOs.setText(null);
+                txtData.setText(null);
+                txtCliId.setText(null);
+                txtOsEquip.setText(null);
+                txtOsDef.setText(null);
+                txtOsServ.setText(null);
+                txtOsTec.setText(null);
+                txtOsValor.setText(null);
+                btnOsAdicionar.setEnabled(true);
+                txtCliPesquisar.setEnabled(true);
+                tblClientes.setVisible(true);
+                txtCliPesquisar.requestFocus();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void excluir_os() {
+        if (txtOs.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nenhuma OS carregada para excluir!");
+            return;
+        }
+        int osNum;
+        try {
+            osNum = Integer.parseInt(txtOs.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Número da OS inválido!");
+            return;
+        }
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir esta OS?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            String sql = "delete from tbos where os=?";
+            try {
+                pst = conexao.prepareStatement(sql);
+                pst.setInt(1, osNum);
+                int apagado = pst.executeUpdate();
+                if (apagado > 0) {
+                    JOptionPane.showMessageDialog(null, "OS excluída com sucesso");
+
                     txtOs.setText(null);
                     txtData.setText(null);
                     txtCliId.setText(null);
@@ -149,11 +243,28 @@ public class TelaOS extends javax.swing.JInternalFrame {
                     btnOsAdicionar.setEnabled(true);
                     txtCliPesquisar.setEnabled(true);
                     tblClientes.setVisible(true);
-
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void imprimir_os() {
+        if (txtOs.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nenhuma OS carregada para imprimir!");
+            return;
+        }
+        int confirma = JOptionPane.showConfirmDialog(null, "Confirma a visualização/impressão desta OS?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            try {
+                HashMap<String, Object> filtro = new HashMap<>();
+                filtro.put("os", Integer.parseInt(txtOs.getText()));
+                JasperPrint print = JasperFillManager.fillReport("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_os\\relatorio_os.jasper", filtro, conexao);
+                JasperViewer.viewReport(print, false);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
     }
 
@@ -311,6 +422,9 @@ public class TelaOS extends javax.swing.JInternalFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente"));
 
         txtCliPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtCliPesquisarKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtCliPesquisarKeyReleased(evt);
             }
@@ -400,7 +514,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         });
 
         btnOsAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/btnAdicionar.png"))); // NOI18N
-        btnOsAdicionar.setToolTipText("Adicionar");
+        btnOsAdicionar.setToolTipText("Adicionar OS");
         btnOsAdicionar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnOsAdicionar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnOsAdicionar.addActionListener(new java.awt.event.ActionListener() {
@@ -415,7 +529,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         });
 
         btnOsPesquisar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/read.png"))); // NOI18N
-        btnOsPesquisar.setToolTipText("Pesquisar");
+        btnOsPesquisar.setToolTipText("Pesquisar OS");
         btnOsPesquisar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnOsPesquisar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnOsPesquisar.addActionListener(new java.awt.event.ActionListener() {
@@ -430,7 +544,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         });
 
         btnOsAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/update.png"))); // NOI18N
-        btnOsAlterar.setToolTipText("Alterar");
+        btnOsAlterar.setToolTipText("Alterar OS");
         btnOsAlterar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnOsAlterar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnOsAlterar.addActionListener(new java.awt.event.ActionListener() {
@@ -445,14 +559,34 @@ public class TelaOS extends javax.swing.JInternalFrame {
         });
 
         btnOsExluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/delete.png"))); // NOI18N
-        btnOsExluir.setToolTipText("Remover");
+        btnOsExluir.setToolTipText("Excluir OS");
         btnOsExluir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnOsExluir.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnOsExluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOsExluirActionPerformed(evt);
+            }
+        });
+        btnOsExluir.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnOsExluirKeyPressed(evt);
+            }
+        });
 
         btnOsImprimir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/print.png"))); // NOI18N
         btnOsImprimir.setToolTipText("Imprimir");
         btnOsImprimir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnOsImprimir.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnOsImprimir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOsImprimirActionPerformed(evt);
+            }
+        });
+        btnOsImprimir.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnOsImprimirKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -614,6 +748,33 @@ public class TelaOS extends javax.swing.JInternalFrame {
             alterar_os();
         }
     }//GEN-LAST:event_btnOsAlterarKeyPressed
+
+    private void btnOsExluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOsExluirActionPerformed
+        excluir_os();
+    }//GEN-LAST:event_btnOsExluirActionPerformed
+
+    private void btnOsExluirKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnOsExluirKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            excluir_os();
+            txtCliPesquisar.requestFocus();
+        }
+    }//GEN-LAST:event_btnOsExluirKeyPressed
+
+    private void txtCliPesquisarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCliPesquisarKeyPressed
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            tblClientes.requestFocus();
+        }
+    }//GEN-LAST:event_txtCliPesquisarKeyPressed
+
+    private void btnOsImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOsImprimirActionPerformed
+        imprimir_os();
+    }//GEN-LAST:event_btnOsImprimirActionPerformed
+
+    private void btnOsImprimirKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnOsImprimirKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            imprimir_os();
+        }
+    }//GEN-LAST:event_btnOsImprimirKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

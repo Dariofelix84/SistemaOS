@@ -38,7 +38,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             } else {
                 int adicionado = pst.executeUpdate();
                 if (adicionado > 0) {
-                    JOptionPane.showMessageDialog(null, "Cliente adicionado com sucesso");
+                    JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso");
                     limpar();
                 }
             }
@@ -81,29 +81,33 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private void alterar() {
         String sql = "update tbclientes set nome_cliente=?,end_cliente=?,fone_cliente=?,email_cliente=? where id_cliente=?";
         try {
+            if (txtCliId.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Selecione um cliente da tabela para alterar!");
+                return;
+            }
+            int cliId;
+            try {
+                cliId = Integer.parseInt(txtCliId.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "O ID deve ser um número inteiro!");
+                return;
+            }
+            if ((txtCliNome.getText().isEmpty()) || (txtCliFone.getText().isEmpty())) {
+                JOptionPane.showMessageDialog(null, "Prencha todos os campos obrigatórios!");
+                return;
+            }
             pst = conexao.prepareStatement(sql);
-
-            int cliId = Integer.parseInt(txtCliId.getText());
             pst.setString(1, txtCliNome.getText());
             pst.setString(2, txtCliEndereco.getText());
             pst.setString(3, txtCliFone.getText());
             pst.setString(4, txtCliEmail.getText());
             pst.setInt(5, cliId);
 
-            if ((txtCliNome.getText().isEmpty()) || (txtCliFone.getText().isEmpty())) {
-
-                JOptionPane.showMessageDialog(null, "Prencha todos os campos obrigatórios!");
-
-            } else {
-
-                int adicionado = pst.executeUpdate();
-                if (adicionado > 0) {
-
-                    JOptionPane.showMessageDialog(null, "Dados do cliente alterados com sucesso");
-                    limpar();
-
-                    btnCliAdicionar.setEnabled(true);
-                }
+            int adicionado = pst.executeUpdate();
+            if (adicionado > 0) {
+                JOptionPane.showMessageDialog(null, "Dados do cliente alterados com sucesso");
+                limpar();
+                btnCliAdicionar.setEnabled(true);
             }
 
         } catch (SQLException e) {
@@ -112,11 +116,21 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     }
 
     private void remover() {
+        if (txtCliId.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Selecione um cliente da tabela para remover!");
+            return;
+        }
+        int userId;
+        try {
+            userId = Integer.parseInt(txtCliId.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "O ID deve ser um número inteiro!");
+            return;
+        }
         int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover esse cliente?", "Atenção", JOptionPane.YES_NO_OPTION);
         if (confirma == JOptionPane.YES_OPTION) {
             String sql = "delete from tbclientes where id_cliente=?";
             try {
-                int userId = Integer.parseInt(txtCliId.getText());
                 pst = conexao.prepareStatement(sql);
                 pst.setInt(1, userId);
                 int apagado = pst.executeUpdate();
@@ -173,7 +187,6 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
-        setResizable(true);
         setTitle("Clientes");
         setPreferredSize(new java.awt.Dimension(640, 480));
 

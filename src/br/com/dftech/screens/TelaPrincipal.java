@@ -26,14 +26,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
      */
     public TelaPrincipal() {
         initComponents();
+        // Ícone da janela
+        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png")).getImage());
         conexao = Moduloconexao.conector();
         // Relógio digital dinâmico que atualiza a data e hora a cada segundo
         new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 java.util.Date data = new java.util.Date();
-                java.text.SimpleDateFormat formatador = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                lblData.setText(formatador.format(data));
+                java.text.SimpleDateFormat fData = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                java.text.SimpleDateFormat fHora = new java.text.SimpleDateFormat("HH:mm:ss");
+                lblData.setText("<html>Data: " + fData.format(data) + "<br>Hora: " + fHora.format(data) + "</html>");
             }
         }).start();
     }
@@ -279,8 +282,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         Date data = new Date();
-        DateFormat formatador = DateFormat.getDateInstance(DateFormat.SHORT);
-        lblData.setText(formatador.format(data));
+        java.text.SimpleDateFormat fData = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        java.text.SimpleDateFormat fHora = new java.text.SimpleDateFormat("HH:mm:ss");
+        lblData.setText("<html>Data: " + fData.format(data) + "<br>Hora: " + fHora.format(data) + "</html>");
     }//GEN-LAST:event_formWindowActivated
 
 

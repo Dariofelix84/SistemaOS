@@ -25,7 +25,7 @@ WHERE tbos.os = $P{os}]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="120" splitType="Stretch">
+		<band height="142" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="0" width="120" height="90" uuid="a6c526f8-4560-4963-8a03-7cb52a4666cf"/>
 				<imageExpression><![CDATA["C:/Users/dario/JaspersoftWorkspace/relatorio_os/x.png"]]></imageExpression>
@@ -100,22 +100,36 @@ WHERE tbos.os = $P{os}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{email_cliente}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="150" y="85" width="55" height="18" uuid="a3c526f8-4560-4963-8a03-7cb52a4666ff"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Técnico:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="205" y="85" width="350" height="18" uuid="b4c526f8-4560-4963-8a03-7cb52a4666ff"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tecnico}]]></textFieldExpression>
+			</textField>
 			<textField>
-				<reportElement x="150" y="88" width="150" height="18" uuid="9c85be-bde8-48b0-8dbb-a81d09e86333"/>
+				<reportElement x="150" y="108" width="150" height="18" uuid="9c85be-bde8-48b0-8dbb-a81d09e86333"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["✔ " + $F{tipo}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="380" y="88" width="45" height="18" uuid="2cb16dbd-34f9-4ef1-9a3d-ba9d51626415"/>
+				<reportElement x="380" y="108" width="45" height="18" uuid="2cb16dbd-34f9-4ef1-9a3d-ba9d51626415"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Valor:]]></text>
 			</staticText>
 			<textField pattern="#,##0.00">
-				<reportElement x="425" y="88" width="130" height="18" uuid="e9039910-b00c-45a6-9022-ae2affa809ec"/>
+				<reportElement x="425" y="108" width="130" height="18" uuid="e9039910-b00c-45a6-9022-ae2affa809ec"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>

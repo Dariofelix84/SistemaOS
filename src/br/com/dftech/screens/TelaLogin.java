@@ -59,6 +59,8 @@ public class TelaLogin extends javax.swing.JFrame{
 
     public TelaLogin() {
         initComponents();
+        // Ícone da janela
+        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png")).getImage());
         conexao = Moduloconexao.conector();
 
         if (conexao != null) {

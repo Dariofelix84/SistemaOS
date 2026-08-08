@@ -7,6 +7,7 @@ package br.com.dftech.screens;
 import br.com.dftech.dal.Moduloconexao;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import java.sql.*;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -261,16 +262,172 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_menCadOSActionPerformed
 
     private void menRelSerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menRelSerActionPerformed
-        int confirma = JOptionPane.showConfirmDialog(null, "Corfirma a emissão do relatório de serviço?", "Atenção", JOptionPane.YES_NO_OPTION);
-        if (confirma == JOptionPane.YES_OPTION) {
+        // Criar painel com campos de data formatados (máscara dd/MM/yyyy)
+        javax.swing.JFormattedTextField fieldIni = null;
+        javax.swing.JFormattedTextField fieldFim = null;
+        try {
+            javax.swing.text.MaskFormatter maskIni = new javax.swing.text.MaskFormatter("##/##/####");
+            maskIni.setPlaceholderCharacter('_');
+            fieldIni = new javax.swing.JFormattedTextField(maskIni);
+
+            javax.swing.text.MaskFormatter maskFim = new javax.swing.text.MaskFormatter("##/##/####");
+            maskFim.setPlaceholderCharacter('_');
+            fieldFim = new javax.swing.JFormattedTextField(maskFim);
+        } catch (java.text.ParseException e) {
+            fieldIni = new javax.swing.JFormattedTextField();
+            fieldFim = new javax.swing.JFormattedTextField();
+        }
+
+        final javax.swing.JFormattedTextField txtDataInicio = fieldIni;
+        final javax.swing.JFormattedTextField txtDataFim = fieldFim;
+
+        javax.swing.JPanel painel = new javax.swing.JPanel(new java.awt.GridLayout(3, 2, 5, 5));
+        txtDataInicio.addAncestorListener(new javax.swing.event.AncestorListener() {
+            @Override
+            public void ancestorAdded(javax.swing.event.AncestorEvent event) {
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        txtDataInicio.requestFocusInWindow();
+                        txtDataInicio.setCaretPosition(0);
+                    }
+                });
+            }
+
+            @Override
+            public void ancestorRemoved(javax.swing.event.AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(javax.swing.event.AncestorEvent event) {}
+        });
+
+        txtDataInicio.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void checkAutoTab() {
+                String digits = txtDataInicio.getText().replaceAll("[^0-9]", "");
+                if (digits.length() == 8) {
+                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            txtDataFim.requestFocusInWindow();
+                            txtDataFim.setCaretPosition(0);
+                        }
+                    });
+                }
+            }
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { checkAutoTab(); }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {}
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { checkAutoTab(); }
+        });
+
+        txtDataFim.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (txtDataFim.getText().replaceAll("[^0-9]", "").isEmpty()) {
+                            txtDataFim.setCaretPosition(0);
+                        }
+                    }
+                });
+            }
+        });
+
+        java.awt.event.ActionListener submitOnEnter = new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                javax.swing.JComponent comp = (javax.swing.JComponent) e.getSource();
+                javax.swing.JOptionPane optionPane = (javax.swing.JOptionPane) javax.swing.SwingUtilities.getAncestorOfClass(javax.swing.JOptionPane.class, comp);
+                if (optionPane != null) {
+                    optionPane.setValue(javax.swing.JOptionPane.OK_OPTION);
+                }
+            }
+        };
+        txtDataInicio.addActionListener(submitOnEnter);
+        txtDataFim.addActionListener(submitOnEnter);
+
+        painel.add(new javax.swing.JLabel("Data Início (dd/MM/yyyy):"));
+        painel.add(txtDataInicio);
+        painel.add(new javax.swing.JLabel("Data Fim (dd/MM/yyyy):"));
+        painel.add(txtDataFim);
+        painel.add(new javax.swing.JLabel(""));
+        painel.add(new javax.swing.JLabel("(Deixe em branco para todas)"));
+
+        int confirma = JOptionPane.showConfirmDialog(null, painel, "Filtro - Relatório de Serviços", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (confirma == JOptionPane.OK_OPTION) {
             try {
-                JasperPrint print = JasperFillManager.fillReport("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_servicos\\relatorio_servicos.jasper", null, conexao);
+                java.text.SimpleDateFormat formatoEntrada = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                formatoEntrada.setLenient(false);
+
+                String digitsIni = txtDataInicio.getText().replaceAll("[^0-9]", "");
+                String digitsFim = txtDataFim.getText().replaceAll("[^0-9]", "");
+
+                // Construir SQL com filtro de data usando tipos corretos
+                String sql = "SELECT OSER.os, data_os, tipo, situacao, equipamento, valor, "
+                        + "CLI.nome_cliente, fone_cliente "
+                        + "FROM tbos AS OSER "
+                        + "INNER JOIN tbclientes AS CLI ON (CLI.id_cliente = OSER.id_cliente) WHERE 1=1";
+
+                java.util.List<java.sql.Date> params = new java.util.ArrayList<>();
+
+                if (!digitsIni.isEmpty()) {
+                    if (digitsIni.length() < 8) {
+                        JOptionPane.showMessageDialog(null, "Data Início incompleta! Use o formato dd/MM/yyyy");
+                        return;
+                    }
+                    String dataIni = txtDataInicio.getText().trim();
+                    java.util.Date dtIni = formatoEntrada.parse(dataIni);
+                    sql += " AND data_os >= ?";
+                    params.add(new java.sql.Date(dtIni.getTime()));
+                }
+
+                if (!digitsFim.isEmpty()) {
+                    if (digitsFim.length() < 8) {
+                        JOptionPane.showMessageDialog(null, "Data Fim incompleta! Use o formato dd/MM/yyyy");
+                        return;
+                    }
+                    String dataFim = txtDataFim.getText().trim();
+                    java.util.Date dtFim = formatoEntrada.parse(dataFim);
+                    // Adicionar 1 dia para filtro exclusivo (data_os < dia seguinte)
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.setTime(dtFim);
+                    cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+                    sql += " AND data_os < ?";
+                    params.add(new java.sql.Date(cal.getTimeInMillis()));
+                }
+
+                sql += " ORDER BY data_os";
+
+                java.sql.PreparedStatement pst = conexao.prepareStatement(sql);
+                for (int i = 0; i < params.size(); i++) {
+                    pst.setDate(i + 1, params.get(i));
+                }
+                java.sql.ResultSet rs = pst.executeQuery();
+
+                // Usar JRResultSetDataSource para passar dados já filtrados ao relatório
+                JasperPrint print = JasperFillManager.fillReport(
+                        "C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_servicos\\relatorio_servicos.jasper",
+                        new HashMap<>(),
+                        new net.sf.jasperreports.engine.JRResultSetDataSource(rs));
                 JasperViewer.viewReport(print, false);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, e);
+            } catch (java.text.ParseException pe) {
+                JOptionPane.showMessageDialog(null, "Data inválida! Use o formato dd/MM/yyyy");
+            } catch (Throwable e) {
+                e.printStackTrace();
+                String msg = "Erro ao gerar relatório:\n" + e.getClass().getName() + "\n" + e.getMessage();
+                Throwable causa = e.getCause();
+                while (causa != null) {
+                    msg += "\n\nCausa: " + causa.getClass().getName() + "\n" + causa.getMessage();
+                    causa = causa.getCause();
+                }
+                JOptionPane.showMessageDialog(null, msg);
             }
         }
     }//GEN-LAST:event_menRelSerActionPerformed
+
 
     private void menCadCliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadCliActionPerformed
         TelaCliente cliente = new TelaCliente();

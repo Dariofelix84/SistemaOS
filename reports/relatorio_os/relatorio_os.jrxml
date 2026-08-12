@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorio_os" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e09c85be-bde8-48b0-8dbb-a81d09e86333">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorio_os" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e09c85be-bde8-48b0-8dbb-a81d09e86333">
 	<parameter name="os" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT tbos.os, tbos.data_os, tbos.tipo, tbos.situacao, tbos.equipamento, tbos.defeito, tbos.servico, tbos.tecnico, tbos.valor,
@@ -27,8 +27,8 @@ WHERE tbos.os = $P{os}]]>
 	<title>
 		<band height="142" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="0" width="120" height="90" uuid="a6c526f8-4560-4963-8a03-7cb52a4666cf"/>
-				<imageExpression><![CDATA["C:/Users/dario/JaspersoftWorkspace/relatorio_os/x.png"]]></imageExpression>
+				<reportElement x="0" y="0" width="168" height="126" uuid="a6c526f8-4560-4963-8a03-7cb52a4666cf"/>
+				<imageExpression><![CDATA["C:/Users/dario/JaspersoftWorkspace/relatorio_os/logo_os.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="150" y="0" width="40" height="20" uuid="7cf44c3c-cb8d-4a1b-90f6-d748f32c91cf"/>
@@ -56,7 +56,7 @@ WHERE tbos.os = $P{os}]]>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{data_os}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="150" y="25" width="55" height="18" uuid="6236b22b-586f-4fb0-a7d5-4554eb75b0f4"/>
@@ -150,21 +150,21 @@ WHERE tbos.os = $P{os}]]>
 				<textElement>
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[equipamento]]></text>
+				<text><![CDATA[Equipamento]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="190" y="10" width="180" height="18" uuid="2cb16dbd-34f9-4ef1-9a3d-ba9d51626415"/>
 				<textElement>
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[defeito]]></text>
+				<text><![CDATA[Defeito]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="380" y="10" width="175" height="18" uuid="e9039910-b00c-45a6-9022-ae2affa809ec"/>
 				<textElement>
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[serviço]]></text>
+				<text><![CDATA[Serviço]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -172,15 +172,15 @@ WHERE tbos.os = $P{os}]]>
 		<band height="60" splitType="Stretch">
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement x="0" y="0" width="180" height="50" uuid="d9a86946-95ea-4430-b3ed-5555227f02ed"/>
-				<textFieldExpression><![CDATA[$F{equipamento}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{equipamento} != null && $F{equipamento}.length() > 0 ? $F{equipamento}.substring(0, 1).toUpperCase() + $F{equipamento}.substring(1) : $F{equipamento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement x="190" y="0" width="180" height="50" uuid="546e99c1-90f6-4717-9742-91af714a00ab"/>
-				<textFieldExpression><![CDATA[$F{defeito}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{defeito} != null && $F{defeito}.length() > 0 ? $F{defeito}.substring(0, 1).toUpperCase() + $F{defeito}.substring(1) : $F{defeito}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true" isStretchWithOverflow="true">
 				<reportElement x="380" y="0" width="175" height="50" uuid="d6a64bb2-d76f-4fc1-9b4c-4ac39ae71b98"/>
-				<textFieldExpression><![CDATA[$F{servico}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{servico} != null && $F{servico}.length() > 0 ? $F{servico}.substring(0, 1).toUpperCase() + $F{servico}.substring(1) : $F{servico}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

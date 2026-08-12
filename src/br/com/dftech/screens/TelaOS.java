@@ -60,7 +60,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
     }
 
     private void emitir_os() {
-        String sql = "insert into tbos (equipamento, defeito, servico, tecnico, valor, id_cliente, tipo, situacao) values(?,?,?,?,?,?,?,?)";
+        String sql = "insert into tbos (data_os, equipamento, defeito, servico, tecnico, valor, id_cliente, tipo, situacao) values(?,?,?,?,?,?,?,?,?)";
         try {
             if ((txtCliId.getText().isEmpty()) || (txtOsEquip.getText().isEmpty()) || (txtOsDef.getText().isEmpty())) {
                 JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios (*)");
@@ -84,14 +84,15 @@ public class TelaOS extends javax.swing.JInternalFrame {
             }
 
             pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtOsEquip.getText());
-            pst.setString(2, txtOsDef.getText());
-            pst.setString(3, txtOsServ.getText());
-            pst.setString(4, txtOsTec.getText());
-            pst.setDouble(5, valor);
-            pst.setInt(6, cliId);
-            pst.setString(7, tipo);
-            pst.setString(8, cboOsSit.getSelectedItem().toString());
+            pst.setTimestamp(1, new java.sql.Timestamp(System.currentTimeMillis()));
+            pst.setString(2, txtOsEquip.getText());
+            pst.setString(3, txtOsDef.getText());
+            pst.setString(4, txtOsServ.getText());
+            pst.setString(5, txtOsTec.getText());
+            pst.setDouble(6, valor);
+            pst.setInt(7, cliId);
+            pst.setString(8, tipo);
+            pst.setString(9, cboOsSit.getSelectedItem().toString());
 
             int adicionado = pst.executeUpdate();
             if (adicionado > 0) {
@@ -122,7 +123,13 @@ public class TelaOS extends javax.swing.JInternalFrame {
             rs = pst.executeQuery();
             if (rs.next()) {
                 txtOs.setText(rs.getString(1));
-                txtData.setText(rs.getString(2));
+                Timestamp dataOs = rs.getTimestamp(2);
+                if (dataOs != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    txtData.setText(sdf.format(dataOs));
+                } else {
+                    txtData.setText(rs.getString(2));
+                }
                 String rbtTipo = rs.getString(9);
                 if (rbtTipo.equals("OS")) {
                     rbtOs.setSelected(true);

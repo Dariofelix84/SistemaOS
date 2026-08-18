@@ -17,38 +17,57 @@ public class TelaLogin extends javax.swing.JFrame {
     ResultSet rs = null;
 
     public void logar() {
-        String sql = "select * from tbusuarios where login=? and senha=?";
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtUsuario.getText());
-            String captura = new String(txtSenha.getPassword());
-            pst.setString(2, captura);
+        String user = txtUsuario.getText().trim();
+        String senha = new String(txtSenha.getPassword());
 
+        if (user.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Preencha o campo Usuário!");
+            txtUsuario.requestFocus();
+            return;
+        }
+
+        if (senha.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Preencha o campo Senha!");
+            txtSenha.requestFocus();
+            return;
+        }
+
+        String sqlUser = "select * from tbusuarios where login=?";
+        try {
+            pst = conexao.prepareStatement(sqlUser);
+            pst.setString(1, user);
             rs = pst.executeQuery();
 
-            if (rs.next()) {
-                String perfil = rs.getString(6);
-                // System.out.println(perfil);
-                // JOptionPane.showMessageDialog(null, perfil);
-                if (perfil.equals("admin")) {
-                    TelaPrincipal principal = new TelaPrincipal();
-                    principal.setVisible(true);
-                    TelaPrincipal.menRel.setEnabled(true);
-                    TelaPrincipal.menCadUsu.setEnabled(true);
+            if (!rs.next()) {
+                JOptionPane.showMessageDialog(null, "Usuário incorreto!");
+                txtUsuario.setText("");
+                txtSenha.setText("");
+                txtUsuario.requestFocus();
+                return;
+            }
 
-                    TelaPrincipal.lblUsuario.setText(rs.getString(2));
-                    TelaPrincipal.lblUsuario.setForeground(Color.red);
-                    this.dispose();
-                    conexao.close();
-                } else {
-                    TelaPrincipal principal = new TelaPrincipal();
-                    principal.setVisible(true);
-                    TelaPrincipal.lblUsuario.setText(rs.getString(2));
-                    this.dispose();
-                }
+            String senhaDb = rs.getString(5);
+            if (!senhaDb.equals(senha)) {
+                JOptionPane.showMessageDialog(null, "Senha incorreta!");
+                txtSenha.setText("");
+                txtSenha.requestFocus();
+                return;
+            }
 
-            } else {
-                JOptionPane.showMessageDialog(null, "Usuário e/ou senha inválido(s)");
+            String perfil = rs.getString(6);
+            TelaPrincipal principal = new TelaPrincipal();
+            principal.setVisible(true);
+            TelaPrincipal.lblUsuario.setText(rs.getString(2));
+
+            if ("admin".equalsIgnoreCase(perfil)) {
+                TelaPrincipal.menRel.setEnabled(true);
+                TelaPrincipal.menCadUsu.setEnabled(true);
+                TelaPrincipal.lblUsuario.setForeground(Color.red);
+            }
+
+            this.dispose();
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
             }
 
         } catch (Exception e) {
@@ -135,55 +154,43 @@ public class TelaLogin extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap(41, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap(40, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(jLabel2)
-                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 26,
+                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 32,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(34, 34, 34)
-                                                .addGroup(layout
-                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtUsuario,
-                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 198,
-                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                198, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
-                                                layout.createSequentialGroup()
-                                                        .addGap(160, 160, 160)
-                                                        .addComponent(btnLogin)))
-                                .addGap(47, 47, 47)));
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(txtUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                                                .addComponent(txtSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE))
+                                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(40, Short.MAX_VALUE)));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(17, 17, 17)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(6, 6, 6)
-                                                .addComponent(jLabel1))
-                                        .addComponent(txtUsuario, javax.swing.GroupLayout.Alignment.TRAILING,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                .addGap(25, 25, 25)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel2)
-                                        .addComponent(txtSenha, javax.swing.GroupLayout.Alignment.TRAILING,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 37,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnLogin))
-                                .addGap(0, 56, Short.MAX_VALUE)));
+                                .addContainerGap(25, Short.MAX_VALUE)));
 
-        setSize(new java.awt.Dimension(376, 187));
+        setSize(new java.awt.Dimension(376, 210));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

@@ -33,8 +33,9 @@ public class TelaSobre extends javax.swing.JFrame{
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sobre");
-        setResizable(false);
-        setSize(new java.awt.Dimension(356, 196));
+        setResizable(true);
+        setMinimumSize(new java.awt.Dimension(361, 216));
+        setSize(new java.awt.Dimension(361, 216));
 
         jLabel1.setText("Sistema para controle de Ordem de Serviços");
 

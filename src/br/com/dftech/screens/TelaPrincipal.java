@@ -56,7 +56,105 @@ public class TelaPrincipal extends javax.swing.JFrame {
         lblUsuario = new javax.swing.JLabel();
         lblData = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel() {
+            private java.awt.Image image = null;
+            private java.awt.image.BufferedImage cachedScaledImage = null;
+            private int cachedW = -1;
+            private int cachedH = -1;
+
+            @Override
+            public void setIcon(javax.swing.Icon icon) {
+                super.setIcon(icon);
+                if (icon instanceof javax.swing.ImageIcon) {
+                    this.image = ((javax.swing.ImageIcon) icon).getImage();
+                    this.cachedScaledImage = null;
+                } else {
+                    this.image = null;
+                    this.cachedScaledImage = null;
+                }
+            }
+
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                if (image != null) {
+                    int width = getWidth();
+                    int height = getHeight();
+                    if (width > 0 && height > 0) {
+                        int imgW = image.getWidth(this);
+                        int imgH = image.getHeight(this);
+                        if (imgW > 0 && imgH > 0) {
+                            double ratio = Math.min((double) width / imgW, (double) height / imgH);
+                            int newW = Math.max(1, (int) (imgW * ratio));
+                            int newH = Math.max(1, (int) (imgH * ratio));
+                            int x = (width - newW) / 2;
+                            int y = (height - newH) / 2;
+
+                            if (cachedScaledImage == null || cachedW != newW || cachedH != newH) {
+                                cachedW = newW;
+                                cachedH = newH;
+                                cachedScaledImage = renderSharpImage(image, newW, newH);
+                            }
+
+                            if (cachedScaledImage != null) {
+                                java.awt.Graphics2D g2d = (java.awt.Graphics2D) g.create();
+                                g2d.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                                g2d.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                                g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                                g2d.drawImage(cachedScaledImage, x, y, this);
+                                g2d.dispose();
+                                return;
+                            }
+                        }
+                    }
+                }
+                super.paintComponent(g);
+            }
+
+            private java.awt.image.BufferedImage renderSharpImage(java.awt.Image srcImg, int targetW, int targetH) {
+                int w = srcImg.getWidth(null);
+                int h = srcImg.getHeight(null);
+                if (w <= 0 || h <= 0) return null;
+
+                java.awt.image.BufferedImage current = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                java.awt.Graphics2D gInitial = current.createGraphics();
+                gInitial.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                gInitial.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                gInitial.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                gInitial.drawImage(srcImg, 0, 0, null);
+                gInitial.dispose();
+
+                // Multi-pass scaling for crystal clear sharpness
+                do {
+                    if (w > targetW) {
+                        w /= 2;
+                        if (w < targetW) w = targetW;
+                    } else {
+                        w = targetW;
+                    }
+
+                    if (h > targetH) {
+                        h /= 2;
+                        if (h < targetH) h = targetH;
+                    } else {
+                        h = targetH;
+                    }
+
+                    java.awt.image.BufferedImage next = new java.awt.image.BufferedImage(w, h, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                    java.awt.Graphics2D g2 = next.createGraphics();
+                    g2.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                    g2.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                    g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setRenderingHint(java.awt.RenderingHints.KEY_ALPHA_INTERPOLATION, java.awt.RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+                    g2.setRenderingHint(java.awt.RenderingHints.KEY_COLOR_RENDERING, java.awt.RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+                    g2.drawImage(current, 0, 0, w, h, null);
+                    g2.dispose();
+
+                    current = next;
+                } while (w != targetW || h != targetH);
+
+                return current;
+            }
+        };
         Menu = new javax.swing.JMenuBar();
         menCadUse = new javax.swing.JMenu();
         menCadCli = new javax.swing.JMenuItem();
@@ -72,10 +170,22 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Dftech - Sistema para controle de OS");
-        setResizable(false);
+        setResizable(true);
+        setMinimumSize(new java.awt.Dimension(935, 551));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
+            }
+        });
+
+        desktop.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                for (javax.swing.JInternalFrame f : desktop.getAllFrames()) {
+                    if (f.isVisible() && !f.isMaximum()) {
+                        centralizarFrame(f);
+                    }
+                }
             }
         });
 
@@ -213,39 +323,27 @@ public class TelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jDesktopPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(desktop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(desktop, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblUsuario)
-                            .addComponent(lblData)
-                            .addComponent(jLabel2)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(88, 88, 88)
-                        .addComponent(jLabel1)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                    .addComponent(lblUsuario)
+                    .addComponent(lblData)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
+                .addContainerGap(25, 25))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(desktop, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGap(43, 43, 43)
                         .addComponent(lblUsuario)
                         .addGap(30, 30, 30)
                         .addComponent(lblData)
-                        .addGap(57, 57, 57)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(desktop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jDesktopPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(30, 30, 30)
-                .addComponent(jLabel1)
+                        .addGap(40, 40, 40)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -253,10 +351,34 @@ public class TelaPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void centralizarInternalFrame(javax.swing.JInternalFrame frame) {
+        desktop.add(frame);
+        frame.setVisible(true);
+        try {
+            frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            // ignore
+        }
+        centralizarFrame(frame);
+    }
+
+    private void centralizarFrame(javax.swing.JInternalFrame frame) {
+        if (frame != null && frame.isVisible() && !frame.isMaximum()) {
+            int desktopWidth = desktop.getWidth();
+            int desktopHeight = desktop.getHeight();
+            int frameWidth = frame.getWidth();
+            int frameHeight = frame.getHeight();
+            if (desktopWidth > 0 && desktopHeight > 0) {
+                int x = Math.max(0, (desktopWidth - frameWidth) / 2);
+                int y = Math.max(0, (desktopHeight - frameHeight) / 2);
+                frame.setLocation(x, y);
+            }
+        }
+    }
+
     private void menCadOSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadOSActionPerformed
         TelaOS os = new TelaOS();
-        os.setVisible(true);
-        desktop.add(os);
+        centralizarInternalFrame(os);
         TelaOS.txtCliPesquisar.requestFocus();
 
     }//GEN-LAST:event_menCadOSActionPerformed
@@ -431,8 +553,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void menCadCliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadCliActionPerformed
         TelaCliente cliente = new TelaCliente();
-        cliente.setVisible(true);
-        desktop.add(cliente);
+        centralizarInternalFrame(cliente);
         TelaCliente.txtCliPesquisar.requestFocus();
 
     }//GEN-LAST:event_menCadCliActionPerformed
@@ -458,13 +579,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void menAjuSobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menAjuSobActionPerformed
         TelaSobre sobre = new TelaSobre();
+        sobre.setLocationRelativeTo(this);
         sobre.setVisible(true);
     }//GEN-LAST:event_menAjuSobActionPerformed
 
     private void menCadUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadUsuActionPerformed
         TelaUsuario usuario = new TelaUsuario();
-        usuario.setVisible(true);
-        desktop.add(usuario);
+        centralizarInternalFrame(usuario);
         TelaUsuario.txtUsuId.requestFocus();
 
 

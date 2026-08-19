@@ -160,9 +160,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         menCadCli = new javax.swing.JMenuItem();
         menCadOS = new javax.swing.JMenuItem();
         menCadUsu = new javax.swing.JMenuItem();
+        menCadPeca = new javax.swing.JMenuItem();
         menRel = new javax.swing.JMenu();
         menRelCli = new javax.swing.JMenuItem();
         menRelSer = new javax.swing.JMenuItem();
+        menRelPecas = new javax.swing.JMenuItem();
         menAju = new javax.swing.JMenu();
         menAjuSob = new javax.swing.JMenuItem();
         menOpc = new javax.swing.JMenu();
@@ -254,6 +256,15 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
         menCadUse.add(menCadUsu);
 
+        menCadPeca.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        menCadPeca.setText("Peça");
+        menCadPeca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menCadPecaActionPerformed(evt);
+            }
+        });
+        menCadUse.add(menCadPeca);
+
         Menu.add(menCadUse);
 
         menRel.setText("Relatório");
@@ -281,6 +292,15 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         });
         menRel.add(menRelSer);
+
+        menRelPecas.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        menRelPecas.setText("Peças em Estoque");
+        menRelPecas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menRelPecasActionPerformed(evt);
+            }
+        });
+        menRel.add(menRelPecas);
 
         Menu.add(menRel);
 
@@ -591,6 +611,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     }//GEN-LAST:event_menCadUsuActionPerformed
 
+    private void menCadPecaActionPerformed(java.awt.event.ActionEvent evt) {
+        TelaPeca peca = new TelaPeca();
+        centralizarInternalFrame(peca);
+        TelaPeca.txtPecaPesquisar.requestFocus();
+    }
+
     private void menCadUseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menCadUseActionPerformed
 
     }//GEN-LAST:event_menCadUseActionPerformed
@@ -610,6 +636,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_menRelCliActionPerformed
+
+    private void menRelPecasActionPerformed(java.awt.event.ActionEvent evt) {
+        TelaRelatorioPecas relPecas = new TelaRelatorioPecas();
+        centralizarInternalFrame(relPecas);
+    }
 
     /**
      * @param args the command line arguments
@@ -658,11 +689,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem menCadOS;
     private javax.swing.JMenu menCadUse;
     public static javax.swing.JMenuItem menCadUsu;
+    private javax.swing.JMenuItem menCadPeca;
     private javax.swing.JMenu menOpc;
     private javax.swing.JMenuItem menOpcSai;
     public static javax.swing.JMenu menRel;
     private javax.swing.JMenuItem menRelCli;
     private javax.swing.JMenuItem menRelSer;
+    private javax.swing.JMenuItem menRelPecas;
     // End of variables declaration//GEN-END:variables
 
 }

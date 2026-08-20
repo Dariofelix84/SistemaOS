@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created for SistemaOS - Relatório de Peças em Estoque com Valor Unitário e Valor Total -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorio_pecas" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e6d1025c-a523-48aa-9dd3-027237329675">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
+	<parameter name="nome_filtro" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select  
+id_peca, nome_peca, qtd_estoque, valor_peca, (qtd_estoque * valor_peca) as total_item
+from tbpecas
+WHERE ($P{nome_filtro} IS NULL OR lower(nome_peca) LIKE lower(concat('%', $P{nome_filtro}, '%')))
+ORDER BY nome_peca ASC]]>
+	</queryString>
+	<field name="id_peca" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="id_peca"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tbpecas"/>
+	</field>
+	<field name="nome_peca" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nome_peca"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tbpecas"/>
+	</field>
+	<field name="qtd_estoque" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="qtd_estoque"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tbpecas"/>
+	</field>
+	<field name="valor_peca" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="valor_peca"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="tbpecas"/>
+	</field>
+	<field name="total_item" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="total_item"/>
+	</field>
+	<variable name="total_qtd_sum" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{qtd_estoque}]]></variableExpression>
+	</variable>
+	<variable name="total_valor_sum" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_item}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="58" splitType="Stretch">
+			<textField pattern="dd, MMMMM yyyy">
+				<reportElement x="701" y="0" width="100" height="30" uuid="8d8aa881-4e9b-4445-92dc-bd8c4ac7d795"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="350" height="30" uuid="c0a06402-f547-46a3-b6e6-60e1e11ac5ef"/>
+				<textElement>
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Peças em Estoque]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="30" uuid="95c2735b-5a9e-4a79-81bb-21aee79c9e14"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="0" width="350" height="28" uuid="fe3d2cc1-46cc-4e56-9df5-44ced2eda5dc"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome da Peça]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="415" y="0" width="100" height="30" uuid="2e8c504c-7a2f-4fc0-816f-e710d499fcbd"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qtd Estoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="525" y="0" width="120" height="30" uuid="da47e3ef-10ad-4f9c-9a98-7fcce51e26ae"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Unit. (R$)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="655" y="0" width="145" height="28" uuid="7918dfd5-358f-46bf-9258-342956e3e060"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total (R$)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="2" width="50" height="18" uuid="7ec4c8c0-ab75-4ae7-ae4a-d10272cd5845"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{id_peca}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="55" y="2" width="350" height="18" uuid="a7accee6-275e-4b21-ba51-b801edec2fe9"/>
+				<textElement>
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nome_peca}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="415" y="2" width="100" height="18" uuid="1e91dac5-e2e7-408b-a48d-4950b2c9d277"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{qtd_estoque}]]></textFieldExpression>
+			</textField>
+			<textField pattern="R$ #,##0.00">
+				<reportElement x="525" y="2" width="120" height="18" uuid="46549e72-0bfd-466e-9a9b-d90ff0f9c547"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valor_peca}]]></textFieldExpression>
+			</textField>
+			<textField pattern="R$ #,##0.00">
+				<reportElement x="655" y="2" width="145" height="18" uuid="4ada05b4-9bf2-431b-bcb2-7ad440cc649a"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total_item}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="10" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement x="709" y="10" width="92" height="25" uuid="a8c3b87f-98e9-4a94-b13e-d4834b9fe312"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="55" y="10" width="180" height="20" uuid="b291a100-1111-2222-3333-444455556666"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total Acumulado:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="415" y="10" width="100" height="20" uuid="b291a100-1111-2222-3333-444455556667"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_qtd_sum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="R$ #,##0.00">
+				<reportElement x="655" y="10" width="145" height="20" uuid="b291a100-1111-2222-3333-444455556668"/>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_valor_sum}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

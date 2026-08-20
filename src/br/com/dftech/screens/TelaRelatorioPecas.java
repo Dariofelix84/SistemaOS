@@ -13,6 +13,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+
 /**
  * Tela de Relatório de Peças em Estoque com filtro por nome e estatísticas.
  * 
@@ -54,7 +61,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
 
         DefaultTableModel model = new DefaultTableModel(
                 new Object[][] {},
-                new String[] { "ID", "Nome da Peça", "Qtd Estoque", "Valor Unit. (R$)", "Total Item (R$)" }) {
+                new String[] { "ID", "Nome da Peça", "Qtd Estoque", "Valor Unitário (R$)", "Valor Total (R$)" }) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -132,17 +139,69 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
     }
 
     private void imprimir() {
-        MessageFormat header = new MessageFormat("Relatório de Peças em Estoque - Dftech");
-        MessageFormat footer = new MessageFormat("Página {0,number,integer}");
+        btnImprimir.setEnabled(false);
+        final String filtro = txtFiltroNome.getText().trim();
 
-        try {
-            boolean complete = tblRelatorio.print(JTable.PrintMode.FIT_WIDTH, header, footer, true, null, true, null);
-            if (complete) {
-                JOptionPane.showMessageDialog(null, "Relatório enviado para impressão / gerado com sucesso!");
+        new javax.swing.SwingWorker<JasperPrint, Void>() {
+            @Override
+            protected JasperPrint doInBackground() throws Exception {
+                net.sf.jasperreports.engine.util.JRProperties.setProperty("net.sf.jasperreports.compiler.class", "net.sf.jasperreports.engine.design.JRJavacCompiler");
+                Map<String, Object> params = new HashMap<>();
+                params.put("nome_filtro", filtro.isEmpty() ? null : filtro);
+
+                File f1 = new File("reports/relatorio_pecas/relatorio_pecas.jasper");
+                File f2 = new File("dist/reports/relatorio_pecas/relatorio_pecas.jasper");
+                File f3 = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_pecas\\relatorio_pecas.jasper");
+
+                String jasperPath = null;
+                if (f1.exists()) jasperPath = f1.getAbsolutePath();
+                else if (f2.exists()) jasperPath = f2.getAbsolutePath();
+                else if (f3.exists()) jasperPath = f3.getAbsolutePath();
+
+                try (Connection conn = Moduloconexao.conector()) {
+                    if (conn == null) throw new Exception("Não foi possível conectar ao banco de dados!");
+
+                    if (jasperPath != null && new File(jasperPath).exists()) {
+                        return JasperFillManager.fillReport(jasperPath, params, conn);
+                    } else {
+                        // Fallback com consulta direta
+                        String sql = "SELECT id_peca, nome_peca, qtd_estoque, valor_peca, (qtd_estoque * valor_peca) AS total_item "
+                                   + "FROM tbpecas WHERE lower(nome_peca) LIKE ? ORDER BY nome_peca ASC";
+                        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                            ps.setString(1, "%" + filtro.toLowerCase() + "%");
+                            try (ResultSet r = ps.executeQuery()) {
+                                net.sf.jasperreports.engine.JRResultSetDataSource ds = new net.sf.jasperreports.engine.JRResultSetDataSource(r);
+                                File jrxml = new File("reports/relatorio_pecas/relatorio_pecas.jrxml");
+                                if (jrxml.exists()) {
+                                    net.sf.jasperreports.engine.JasperReport jr = net.sf.jasperreports.engine.JasperCompileManager.compileReport(jrxml.getAbsolutePath());
+                                    return JasperFillManager.fillReport(jr, params, ds);
+                                }
+                                throw new Exception("Arquivo relatorio_pecas.jasper não foi localizado!");
+                            }
+                        }
+                    }
+                }
             }
-        } catch (PrinterException pe) {
-            JOptionPane.showMessageDialog(null, "Erro ao imprimir o relatório: " + pe.getMessage());
-        }
+
+            @Override
+            protected void done() {
+                btnImprimir.setEnabled(true);
+                try {
+                    JasperPrint print = get();
+                    if (print != null) {
+                        JasperViewer viewer = new JasperViewer(print, false);
+                        viewer.setTitle("Relatório de Peças em Estoque");
+                        viewer.setVisible(true);
+                        viewer.toFront();
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    Throwable cause = t;
+                    while (cause.getCause() != null) cause = cause.getCause();
+                    JOptionPane.showMessageDialog(null, "Erro ao gerar relatório:\n" + cause.getMessage(), "Erro no Relatório", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
     }
 
     private void initComponents() {
@@ -207,7 +266,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
         tblRelatorio.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][] {},
                 new String[] {
-                        "ID", "Nome da Peça", "Qtd Estoque", "Valor Unit. (R$)", "Total Item (R$)"
+                        "ID", "Nome da Peça", "Qtd Estoque", "Valor Unitário (R$)", "Valor Total (R$)"
                 }));
         tblRelatorio.setRowHeight(22);
         jScrollPane1.setViewportView(tblRelatorio);

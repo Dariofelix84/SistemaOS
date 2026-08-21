@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import java.sql.*;
+import java.io.File;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -559,12 +560,41 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 }
                 java.sql.ResultSet rs = pst.executeQuery();
 
-                // Usar JRResultSetDataSource para passar dados já filtrados ao relatório
-                JasperPrint print = JasperFillManager.fillReport(
-                        "C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_servicos\\relatorio_servicos.jasper",
-                        new HashMap<>(),
-                        new net.sf.jasperreports.engine.JRResultSetDataSource(rs));
-                JasperViewer.viewReport(print, false);
+                net.sf.jasperreports.engine.util.JRProperties.setProperty("net.sf.jasperreports.compiler.class", "net.sf.jasperreports.engine.design.JRJavacCompiler");
+
+                File f1 = new File("reports/relatorio_servicos/relatorio_servicos.jasper");
+                File f2 = new File("dist/reports/relatorio_servicos/relatorio_servicos.jasper");
+                File f3 = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_servicos\\relatorio_servicos.jasper");
+
+                String jasperPath = null;
+                if (f1.exists()) jasperPath = f1.getAbsolutePath();
+                else if (f2.exists()) jasperPath = f2.getAbsolutePath();
+                else if (f3.exists()) jasperPath = f3.getAbsolutePath();
+
+                if (jasperPath == null || !new File(jasperPath).exists()) {
+                    File jrxml = new File("reports/relatorio_servicos/relatorio_servicos.jrxml");
+                    if (!jrxml.exists()) {
+                        jrxml = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_servicos\\relatorio_servicos.jrxml");
+                    }
+                    if (jrxml.exists()) {
+                        File targetJasper = new File("reports/relatorio_servicos/relatorio_servicos.jasper");
+                        if (!targetJasper.getParentFile().exists()) {
+                            targetJasper.getParentFile().mkdirs();
+                        }
+                        net.sf.jasperreports.engine.JasperCompileManager.compileReportToFile(jrxml.getAbsolutePath(), targetJasper.getAbsolutePath());
+                        jasperPath = targetJasper.getAbsolutePath();
+                    }
+                }
+
+                if (jasperPath != null && new File(jasperPath).exists()) {
+                    JasperPrint print = JasperFillManager.fillReport(
+                            jasperPath,
+                            new HashMap<>(),
+                            new net.sf.jasperreports.engine.JRResultSetDataSource(rs));
+                    JasperViewer.viewReport(print, false);
+                } else {
+                    throw new Exception("Arquivo relatorio_servicos.jasper não foi localizado!");
+                }
             } catch (java.text.ParseException pe) {
                 JOptionPane.showMessageDialog(null, "Data inválida! Use o formato dd/MM/yyyy");
             } catch (Throwable e) {

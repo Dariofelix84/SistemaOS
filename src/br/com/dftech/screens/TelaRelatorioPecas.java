@@ -35,7 +35,6 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
 
     // Componentes Swing
     private javax.swing.JButton btnImprimir;
-    private javax.swing.JButton btnPesquisar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblTotalItens;
     private javax.swing.JLabel lblTotalQtd;
@@ -207,7 +206,6 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
     private void initComponents() {
         jLabel1 = new javax.swing.JLabel();
         txtFiltroNome = new javax.swing.JTextField();
-        btnPesquisar = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblRelatorio = new javax.swing.JTable();
@@ -235,25 +233,13 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
             }
         });
 
-        javax.swing.ImageIcon iconPesquisar = new javax.swing.ImageIcon(
-                getClass().getResource("/br/com/dftech/icons/pesquisar.png"));
-        btnPesquisar.setIcon(iconPesquisar);
-        btnPesquisar.setText("Filtrar");
-        btnPesquisar.setToolTipText("Buscar peças");
-        btnPesquisar.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                carregarRelatorio();
-            }
-        });
-
         javax.swing.ImageIcon iconPrintRaw = new javax.swing.ImageIcon(
                 getClass().getResource("/br/com/dftech/icons/print.png"));
-        int iconW = iconPesquisar.getIconWidth() > 0 ? iconPesquisar.getIconWidth() : 20;
-        int iconH = iconPesquisar.getIconHeight() > 0 ? iconPesquisar.getIconHeight() : 20;
-        java.awt.Image imgPrintScaled = iconPrintRaw.getImage().getScaledInstance(iconW, iconH,
+        java.awt.Image imgPrintScaled = iconPrintRaw.getImage().getScaledInstance(16, 16,
                 java.awt.Image.SCALE_SMOOTH);
         btnImprimir.setIcon(new javax.swing.ImageIcon(imgPrintScaled));
+        btnImprimir.setFont(new java.awt.Font("Segoe UI", 0, 14));
+        btnImprimir.setMargin(new java.awt.Insets(2, 10, 2, 10));
         btnImprimir.setText("Imprimir");
         btnImprimir.setToolTipText("Imprimir relatório");
         btnImprimir.addActionListener(new java.awt.event.ActionListener() {
@@ -328,9 +314,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                                                 .addComponent(jLabel1)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                        180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnPesquisar)
+                                                        240, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(btnImprimir)))
                                 .addGap(18, 18, 18)));
@@ -344,7 +328,6 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                                         .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnPesquisar)
                                         .addComponent(btnImprimir))
                                 .addGap(15, 15, 15)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)

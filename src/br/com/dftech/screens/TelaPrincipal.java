@@ -165,6 +165,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         menRelCli = new javax.swing.JMenuItem();
         menRelSer = new javax.swing.JMenuItem();
         menRelPecas = new javax.swing.JMenuItem();
+        menRelOS = new javax.swing.JMenuItem();
         menAju = new javax.swing.JMenu();
         menAjuSob = new javax.swing.JMenuItem();
         menOpc = new javax.swing.JMenu();
@@ -301,6 +302,15 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         });
         menRel.add(menRelPecas);
+
+        menRelOS.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        menRelOS.setText("OS por Cliente");
+        menRelOS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menRelOSActionPerformed(evt);
+            }
+        });
+        menRel.add(menRelOS);
 
         Menu.add(menRel);
 
@@ -642,6 +652,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         centralizarInternalFrame(relPecas);
     }
 
+    private void menRelOSActionPerformed(java.awt.event.ActionEvent evt) {
+        TelaRelatorioOS relOS = new TelaRelatorioOS();
+        centralizarInternalFrame(relOS);
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -696,6 +711,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem menRelCli;
     private javax.swing.JMenuItem menRelSer;
     private javax.swing.JMenuItem menRelPecas;
+    private javax.swing.JMenuItem menRelOS;
     // End of variables declaration//GEN-END:variables
 
 }

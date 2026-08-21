@@ -1,16 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package br.com.dftech.screens;
 
 import java.sql.*;
 import br.com.dftech.dal.Moduloconexao;
-import java.awt.print.PrinterException;
 import java.text.DecimalFormat;
-import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import java.io.File;
@@ -21,30 +15,31 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
- * Tela de Relatório de Peças em Estoque com filtro por nome e estatísticas.
+ * Tela de Relatório de Ordens de Serviço com filtro por nome de cliente e estatísticas.
  * 
  * @author dario
  */
-public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
+public class TelaRelatorioOS extends javax.swing.JInternalFrame {
 
     Connection conexao = null;
     PreparedStatement pst = null;
     ResultSet rs = null;
 
     private static final DecimalFormat df = new DecimalFormat("R$ #,##0.00");
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     // Componentes Swing
     private javax.swing.JButton btnImprimir;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel lblTotalItens;
-    private javax.swing.JLabel lblTotalQtd;
+    private javax.swing.JLabel lblTotalOS;
+    private javax.swing.JLabel lblTotalTipos;
     private javax.swing.JLabel lblTotalValor;
     private javax.swing.JPanel panelResumo;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblRelatorio;
-    private javax.swing.JTextField txtFiltroNome;
+    private javax.swing.JTextField txtFiltroCliente;
 
-    public TelaRelatorioPecas() {
+    public TelaRelatorioOS() {
         initComponents();
         conexao = Moduloconexao.conector();
         carregarRelatorio();
@@ -54,21 +49,23 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
         if (conexao == null)
             return;
 
-        String filtro = txtFiltroNome.getText().trim().toLowerCase();
-        String sql = "SELECT id_peca, nome_peca, qtd_estoque, valor_peca, (qtd_estoque * valor_peca) AS total_item "
-                + "FROM tbpecas WHERE lower(nome_peca) LIKE ? ORDER BY nome_peca ASC";
+        String filtro = txtFiltroCliente.getText().trim().toLowerCase();
+        String sql = "SELECT O.os, O.data_os, C.nome_cliente, O.tipo, O.situacao, O.equipamento, O.servico, O.tecnico, O.valor "
+                + "FROM tbos O INNER JOIN tbclientes C ON O.id_cliente = C.id_cliente "
+                + "WHERE lower(C.nome_cliente) LIKE ? ORDER BY O.os DESC";
 
         DefaultTableModel model = new DefaultTableModel(
                 new Object[][] {},
-                new String[] { "ID", "Nome da Peça", "Qtd Estoque", "Valor Unitário (R$)", "Valor Total (R$)" }) {
+                new String[] { "Nº OS", "Data/Hora", "Cliente", "Tipo", "Situação", "Equipamento", "Serviço", "Técnico", "Valor (R$)" }) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        int totalItens = 0;
-        int totalQtd = 0;
+        int totalOS = 0;
+        int qtdOrcamento = 0;
+        int qtdOS = 0;
         double totalValorAcumulado = 0.0;
 
         try {
@@ -77,22 +74,35 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
             rs = pst.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id_peca");
-                String nome = rs.getString("nome_peca");
-                int qtd = rs.getInt("qtd_estoque");
-                double valorUnit = rs.getDouble("valor_peca");
-                double totalItem = rs.getDouble("total_item");
+                int osNum = rs.getInt("os");
+                Timestamp dataOs = rs.getTimestamp("data_os");
+                String dataStr = (dataOs != null) ? sdf.format(dataOs) : "";
+                String cliente = rs.getString("nome_cliente");
+                String tipoStr = rs.getString("tipo");
+                String situacao = rs.getString("situacao");
+                String equip = rs.getString("equipamento");
+                String servico = rs.getString("servico");
+                String tecnico = rs.getString("tecnico");
+                double valor = rs.getDouble("valor");
 
-                totalItens++;
-                totalQtd += qtd;
-                totalValorAcumulado += totalItem;
+                totalOS++;
+                if ("Orçamento".equalsIgnoreCase(tipoStr)) {
+                    qtdOrcamento++;
+                } else {
+                    qtdOS++;
+                }
+                totalValorAcumulado += valor;
 
                 model.addRow(new Object[] {
-                        id,
-                        nome,
-                        qtd,
-                        df.format(valorUnit),
-                        df.format(totalItem)
+                        osNum,
+                        dataStr,
+                        cliente,
+                        tipoStr,
+                        situacao,
+                        equip,
+                        servico,
+                        tecnico,
+                        df.format(valor)
                 });
             }
 
@@ -106,30 +116,42 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
             javax.swing.table.DefaultTableCellRenderer rightRenderer = new javax.swing.table.DefaultTableCellRenderer();
             rightRenderer.setHorizontalAlignment(javax.swing.JLabel.RIGHT);
 
-            if (tblRelatorio.getColumnModel().getColumnCount() >= 5) {
-                // Coluna ID (3 dígitos)
-                tblRelatorio.getColumnModel().getColumn(0).setPreferredWidth(35);
-                tblRelatorio.getColumnModel().getColumn(0).setMaxWidth(45);
+            if (tblRelatorio.getColumnModel().getColumnCount() >= 9) {
+                // Nº OS
+                tblRelatorio.getColumnModel().getColumn(0).setPreferredWidth(45);
+                tblRelatorio.getColumnModel().getColumn(0).setMaxWidth(60);
                 tblRelatorio.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
-                // Coluna Nome da Peça
-                tblRelatorio.getColumnModel().getColumn(1).setPreferredWidth(210);
+                // Data/Hora
+                tblRelatorio.getColumnModel().getColumn(1).setPreferredWidth(110);
+                tblRelatorio.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
 
-                // Coluna Qtd Estoque (3 dígitos)
-                tblRelatorio.getColumnModel().getColumn(2).setPreferredWidth(80);
-                tblRelatorio.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+                // Cliente
+                tblRelatorio.getColumnModel().getColumn(2).setPreferredWidth(140);
 
-                // Coluna Valor Unitario (R$)
-                tblRelatorio.getColumnModel().getColumn(3).setPreferredWidth(105);
-                tblRelatorio.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+                // Tipo
+                tblRelatorio.getColumnModel().getColumn(3).setPreferredWidth(70);
+                tblRelatorio.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 
-                // Coluna Total Item (R$)
-                tblRelatorio.getColumnModel().getColumn(4).setPreferredWidth(105);
-                tblRelatorio.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+                // Situação
+                tblRelatorio.getColumnModel().getColumn(4).setPreferredWidth(95);
+
+                // Equipamento
+                tblRelatorio.getColumnModel().getColumn(5).setPreferredWidth(145);
+
+                // Serviço
+                tblRelatorio.getColumnModel().getColumn(6).setPreferredWidth(120);
+
+                // Técnico
+                tblRelatorio.getColumnModel().getColumn(7).setPreferredWidth(100);
+
+                // Valor (R$)
+                tblRelatorio.getColumnModel().getColumn(8).setPreferredWidth(90);
+                tblRelatorio.getColumnModel().getColumn(8).setCellRenderer(rightRenderer);
             }
 
-            lblTotalItens.setText("Tipos de Peça: " + totalItens);
-            lblTotalQtd.setText("Qtd Total em Estoque: " + totalQtd);
+            lblTotalOS.setText("Total de Registros: " + totalOS);
+            lblTotalTipos.setText("Orçamentos: " + qtdOrcamento + " | OS: " + qtdOS);
             lblTotalValor.setText("Valor Total Acumulado: " + df.format(totalValorAcumulado));
 
         } catch (SQLException e) {
@@ -139,7 +161,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
 
     private void imprimir() {
         btnImprimir.setEnabled(false);
-        final String filtro = txtFiltroNome.getText().trim();
+        final String filtro = txtFiltroCliente.getText().trim();
 
         new javax.swing.SwingWorker<JasperPrint, Void>() {
             @Override
@@ -148,19 +170,20 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                 Map<String, Object> params = new HashMap<>();
                 params.put("nome_filtro", filtro.isEmpty() ? null : filtro);
 
-                File f1 = new File("reports/relatorio_pecas/relatorio_pecas.jasper");
-                File f2 = new File("dist/reports/relatorio_pecas/relatorio_pecas.jasper");
-                File f3 = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_pecas\\relatorio_pecas.jasper");
+                File f1 = new File("reports/relatorio_os_cliente/relatorio_os_cliente.jasper");
+                File f2 = new File("dist/reports/relatorio_os_cliente/relatorio_os_cliente.jasper");
+                File f3 = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_os_cliente\\relatorio_os_cliente.jasper");
 
                 String jasperPath = null;
                 if (f1.exists()) jasperPath = f1.getAbsolutePath();
                 else if (f2.exists()) jasperPath = f2.getAbsolutePath();
                 else if (f3.exists()) jasperPath = f3.getAbsolutePath();
 
+                // Se o arquivo .jasper nao existir no disco, compila o .jrxml e salva o .jasper para os proximos usos ficarem instantaneos
                 if (jasperPath == null || !new File(jasperPath).exists()) {
-                    File jrxml = new File("reports/relatorio_pecas/relatorio_pecas.jrxml");
+                    File jrxml = new File("reports/relatorio_os_cliente/relatorio_os_cliente.jrxml");
                     if (jrxml.exists()) {
-                        File targetJasper = new File("reports/relatorio_pecas/relatorio_pecas.jasper");
+                        File targetJasper = new File("reports/relatorio_os_cliente/relatorio_os_cliente.jasper");
                         if (!targetJasper.getParentFile().exists()) {
                             targetJasper.getParentFile().mkdirs();
                         }
@@ -175,7 +198,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                     if (jasperPath != null && new File(jasperPath).exists()) {
                         return JasperFillManager.fillReport(jasperPath, params, conn);
                     } else {
-                        throw new Exception("Arquivo relatorio_pecas.jasper não foi localizado!");
+                        throw new Exception("Arquivo de relatório relatorio_os_cliente.jasper não foi localizado!");
                     }
                 }
             }
@@ -187,7 +210,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                     JasperPrint print = get();
                     if (print != null) {
                         JasperViewer viewer = new JasperViewer(print, false);
-                        viewer.setTitle("Relatório de Peças em Estoque");
+                        viewer.setTitle("Relatório de OS por Cliente");
                         viewer.setVisible(true);
                         viewer.toFront();
                     }
@@ -203,28 +226,28 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
 
     private void initComponents() {
         jLabel1 = new javax.swing.JLabel();
-        txtFiltroNome = new javax.swing.JTextField();
+        txtFiltroCliente = new javax.swing.JTextField();
         btnImprimir = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblRelatorio = new javax.swing.JTable();
         panelResumo = new javax.swing.JPanel();
-        lblTotalItens = new javax.swing.JLabel();
-        lblTotalQtd = new javax.swing.JLabel();
+        lblTotalOS = new javax.swing.JLabel();
+        lblTotalTipos = new javax.swing.JLabel();
         lblTotalValor = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Relatório de Peças em Estoque");
+        setTitle("Relatório de OS por Cliente");
         setMinimumSize(new java.awt.Dimension(640, 480));
         setPreferredSize(new java.awt.Dimension(640, 480));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel1.setText("Filtrar por nome:");
+        jLabel1.setText("Filtrar por nome do cliente:");
 
-        txtFiltroNome.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        txtFiltroNome.addKeyListener(new java.awt.event.KeyAdapter() {
+        txtFiltroCliente.setFont(new java.awt.Font("Segoe UI", 0, 14));
+        txtFiltroCliente.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 carregarRelatorio();
@@ -264,23 +287,23 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
         tblRelatorio.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][] {},
                 new String[] {
-                        "ID", "Nome da Peça", "Qtd Estoque", "Valor Unitário (R$)", "Valor Total (R$)"
+                        "Nº OS", "Data/Hora", "Cliente", "Tipo", "Situação", "Equipamento", "Serviço", "Técnico", "Valor (R$)"
                 }));
         tblRelatorio.setRowHeight(22);
         jScrollPane1.setViewportView(tblRelatorio);
 
         panelResumo.setBorder(javax.swing.BorderFactory.createTitledBorder(
-                javax.swing.BorderFactory.createEtchedBorder(), "Resumo do Estoque",
+                javax.swing.BorderFactory.createEtchedBorder(), "Resumo das Ordens de Serviço",
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 new java.awt.Font("Segoe UI", 1, 12)));
 
-        lblTotalItens.setFont(new java.awt.Font("Segoe UI", 1, 13));
-        lblTotalItens.setText("Tipos de Peça: 0");
+        lblTotalOS.setFont(new java.awt.Font("Segoe UI", 1, 13));
+        lblTotalOS.setText("Total de Registros: 0");
 
-        lblTotalQtd.setFont(new java.awt.Font("Segoe UI", 1, 13));
-        lblTotalQtd.setForeground(new java.awt.Color(0, 102, 204));
-        lblTotalQtd.setText("Qtd Total em Estoque: 0");
+        lblTotalTipos.setFont(new java.awt.Font("Segoe UI", 1, 13));
+        lblTotalTipos.setForeground(new java.awt.Color(0, 102, 204));
+        lblTotalTipos.setText("Orçamentos: 0 | OS: 0");
 
         lblTotalValor.setFont(new java.awt.Font("Segoe UI", 1, 13));
         lblTotalValor.setForeground(new java.awt.Color(0, 128, 0));
@@ -292,10 +315,10 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                 panelResumoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(panelResumoLayout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(lblTotalItens, javax.swing.GroupLayout.PREFERRED_SIZE, 135,
+                                .addComponent(lblTotalOS, javax.swing.GroupLayout.PREFERRED_SIZE, 140,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(15, 15, 15)
-                                .addComponent(lblTotalQtd, javax.swing.GroupLayout.PREFERRED_SIZE, 175,
+                                .addComponent(lblTotalTipos, javax.swing.GroupLayout.PREFERRED_SIZE, 175,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(15, 15, 15)
                                 .addComponent(lblTotalValor, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
@@ -306,8 +329,8 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                                 .addGap(8, 8, 8)
                                 .addGroup(panelResumoLayout
                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(lblTotalItens)
-                                        .addComponent(lblTotalQtd)
+                                        .addComponent(lblTotalOS)
+                                        .addComponent(lblTotalTipos)
                                         .addComponent(lblTotalValor))
                                 .addContainerGap(10, Short.MAX_VALUE)));
 
@@ -325,7 +348,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jLabel1)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                .addComponent(txtFiltroCliente, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                         240, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(btnImprimir)))
@@ -337,7 +360,7 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel1)
-                                        .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        .addComponent(txtFiltroCliente, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnImprimir))

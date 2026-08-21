@@ -83,8 +83,9 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 }
             }
 
-            pst = conexao.prepareStatement(sql);
-            pst.setTimestamp(1, new java.sql.Timestamp(System.currentTimeMillis()));
+            pst = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            Timestamp dataAtual = new java.sql.Timestamp(System.currentTimeMillis());
+            pst.setTimestamp(1, dataAtual);
             pst.setString(2, txtOsEquip.getText());
             pst.setString(3, txtOsDef.getText());
             pst.setString(4, txtOsServ.getText());
@@ -96,15 +97,34 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
             int adicionado = pst.executeUpdate();
             if (adicionado > 0) {
+                String osGerada = null;
+                try (ResultSet rsKeys = pst.getGeneratedKeys()) {
+                    if (rsKeys.next()) {
+                        osGerada = rsKeys.getString(1);
+                    }
+                } catch (Exception eKey) {
+                    // Fallback
+                }
+
+                if (osGerada == null || osGerada.trim().isEmpty()) {
+                    String sqlMax = "select max(os) from tbos";
+                    try (PreparedStatement pstMax = conexao.prepareStatement(sqlMax);
+                         ResultSet rsMax = pstMax.executeQuery()) {
+                        if (rsMax.next()) {
+                            osGerada = rsMax.getString(1);
+                        }
+                    }
+                }
+
+                txtOs.setText(osGerada);
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                txtData.setText(sdf.format(dataAtual));
+
+                btnOsAdicionar.setEnabled(false);
+                txtCliPesquisar.setEnabled(false);
+                tblClientes.setVisible(false);
+
                 JOptionPane.showMessageDialog(null, "OS emitida com sucesso");
-                txtCliId.setText(null);
-                txtOsEquip.setText(null);
-                txtOsDef.setText(null);
-                txtOsServ.setText(null);
-                txtOsTec.setText(null);
-                txtOsValor.setText(null);
-                txtOs.setText(null);
-                txtData.setText(null);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);

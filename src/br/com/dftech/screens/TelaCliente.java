@@ -57,6 +57,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
             rs = pst.executeQuery();
             tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+            configurarLarguraColunasTabela();
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
@@ -64,6 +65,24 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
         if (txtCliPesquisar.getText().isEmpty()) {
             limpar();
+        }
+    }
+
+    private void configurarLarguraColunasTabela() {
+        if (tblClientes.getColumnCount() >= 5) {
+            // Coluna ID (0) ajustada para 4 dígitos
+            tblClientes.getColumnModel().getColumn(0).setPreferredWidth(50);
+            tblClientes.getColumnModel().getColumn(0).setMaxWidth(60);
+            tblClientes.getColumnModel().getColumn(0).setMinWidth(40);
+
+            javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+            tblClientes.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+            tblClientes.getColumnModel().getColumn(1).setPreferredWidth(180);
+            tblClientes.getColumnModel().getColumn(2).setPreferredWidth(200);
+            tblClientes.getColumnModel().getColumn(3).setPreferredWidth(100);
+            tblClientes.getColumnModel().getColumn(4).setPreferredWidth(150);
         }
     }
 

@@ -49,10 +49,26 @@ public class TelaOS extends javax.swing.JInternalFrame {
             pst.setString(1, txtCliPesquisar.getText().toLowerCase() + "%");
             rs = pst.executeQuery();
             tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+            configurarLarguraColunasTabelaClientes();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
 
+    }
+
+    private void configurarLarguraColunasTabelaClientes() {
+        if (tblClientes.getColumnCount() >= 3) {
+            tblClientes.getColumnModel().getColumn(0).setPreferredWidth(50);
+            tblClientes.getColumnModel().getColumn(0).setMaxWidth(60);
+            tblClientes.getColumnModel().getColumn(0).setMinWidth(40);
+
+            javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+            tblClientes.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+            tblClientes.getColumnModel().getColumn(1).setPreferredWidth(250);
+            tblClientes.getColumnModel().getColumn(2).setPreferredWidth(120);
+        }
     }
 
     private void setar_campos() {
@@ -432,7 +448,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
         jLabel3.setText("Situação");
 
-        cboOsSit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Na bancada", "Entrega OK", "Orçamento REPROVADO", "Aguardando Aprovação", "Aguardando peças", "Abandonado pelo cliente\t", "Retornou" }));
+        cboOsSit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Na bancada", "Entrega OK", "Orçamento APROVADO", "Orçamento REPROVADO", "Aguardando Aprovação", "Aguardando peças", "Abandonado pelo cliente", "Retornou" }));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente"));
 

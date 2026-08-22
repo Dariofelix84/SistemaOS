@@ -6,6 +6,7 @@ package br.com.dftech.screens;
 
 import java.sql.*;
 import br.com.dftech.dal.Moduloconexao;
+import br.com.dftech.utils.MascaraValor;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import javax.swing.JFormattedTextField;
@@ -37,7 +38,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         conexao = Moduloconexao.conector();
         txtCliId.setHorizontalAlignment(JTextField.CENTER);
         txtOs.setHorizontalAlignment(JTextField.CENTER);
-        txtOsValor.setHorizontalAlignment(JFormattedTextField.RIGHT);
+        MascaraValor.aplicar(txtOsValor);
 
     }
 
@@ -73,15 +74,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "ID do cliente inválido!");
                 return;
             }
-            double valor = 0.0;
-            if (!txtOsValor.getText().trim().isEmpty()) {
-                try {
-                    valor = Double.parseDouble(txtOsValor.getText().replace(",", "."));
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Valor da OS inválido!");
-                    return;
-                }
-            }
+            double valor = MascaraValor.getValor(txtOsValor);
 
             pst = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             Timestamp dataAtual = new java.sql.Timestamp(System.currentTimeMillis());
@@ -163,7 +156,8 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 txtOsDef.setText(rs.getString(4));
                 txtOsServ.setText(rs.getString(5));
                 txtOsTec.setText(rs.getString(6));
-                txtOsValor.setText(rs.getString(7));
+                double valOs = rs.getDouble(7);
+                MascaraValor.setValor(txtOsValor, valOs);
                 txtCliId.setText(rs.getString(8));
                 btnOsAdicionar.setEnabled(false);
                 txtCliPesquisar.setEnabled(false);
@@ -195,15 +189,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Número da OS inválido!");
             return;
         }
-        double valor = 0.0;
-        if (!txtOsValor.getText().trim().isEmpty()) {
-            try {
-                valor = Double.parseDouble(txtOsValor.getText().replace(",", "."));
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Valor da OS inválido!");
-                return;
-            }
-        }
+        double valor = MascaraValor.getValor(txtOsValor);
         String sql = "update tbos set equipamento=?, defeito=?, servico=?, tecnico=?, valor=?, tipo=?, situacao=? where os=?";
         try {
             pst = conexao.prepareStatement(sql);
@@ -535,7 +521,6 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
         jLabel10.setText("Valor Total");
 
-        txtOsValor.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
         txtOsValor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtOsValorActionPerformed(evt);

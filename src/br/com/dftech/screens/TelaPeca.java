@@ -6,6 +6,7 @@ package br.com.dftech.screens;
 
 import java.sql.*;
 import br.com.dftech.dal.Moduloconexao;
+import br.com.dftech.utils.MascaraValor;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -92,6 +93,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         otimizarFotosExistentesDoBanco();
         txtPecaId.setHorizontalAlignment(JTextField.CENTER);
         txtPecaQtd.setHorizontalAlignment(JTextField.CENTER);
+        MascaraValor.aplicar(txtPecaValor);
         configurarLarguraColunasTabela();
     }
 
@@ -306,15 +308,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                 return;
             }
 
-            double valor = 0.0;
-            if (!txtPecaValor.getText().trim().isEmpty()) {
-                try {
-                    valor = Double.parseDouble(txtPecaValor.getText().trim().replace(",", "."));
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "O Valor deve ser um número válido (ex: 15.50)!");
-                    return;
-                }
-            }
+            double valor = MascaraValor.getValor(txtPecaValor);
 
             pst = conexao.prepareStatement(sql);
             pst.setString(1, txtPecaNome.getText().trim());
@@ -555,7 +549,16 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         txtPecaId.setText(idObj.toString());
         txtPecaNome.setText(nomeObj != null ? nomeObj.toString() : "");
         txtPecaQtd.setText(qtdObj != null ? qtdObj.toString() : "0");
-        txtPecaValor.setText(valorObj != null ? valorObj.toString() : "0.00");
+        if (valorObj != null) {
+            try {
+                double val = Double.parseDouble(valorObj.toString().replace(",", "."));
+                MascaraValor.setValor(txtPecaValor, val);
+            } catch (Exception e) {
+                txtPecaValor.setText("");
+            }
+        } else {
+            txtPecaValor.setText("");
+        }
         
         btnPecaAdicionar.setEnabled(false);
 
@@ -670,15 +673,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
             return;
         }
 
-        double valor = 0.0;
-        if (!txtPecaValor.getText().trim().isEmpty()) {
-            try {
-                valor = Double.parseDouble(txtPecaValor.getText().trim().replace(",", "."));
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "O Valor deve ser um número válido (ex: 15.50)!");
-                return;
-            }
-        }
+        double valor = MascaraValor.getValor(txtPecaValor);
 
         String sql = "update tbpecas set nome_peca=?, qtd_estoque=?, valor_peca=?, foto_peca=? where id_peca=?";
         try {

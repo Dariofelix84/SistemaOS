@@ -28,6 +28,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
      */
     public TelaPrincipal() {
         initComponents();
+        // Maximiza a janela automaticamente para excelente visualização em notebooks (16", 15.6", etc.)
+        setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
         // Ícone da janela
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png")).getImage());
         conexao = Moduloconexao.conector();
@@ -378,7 +380,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        setSize(new java.awt.Dimension(935, 551));
+        setSize(new java.awt.Dimension(1150, 680));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -386,6 +388,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         desktop.add(frame);
         frame.setVisible(true);
         try {
+            frame.setMaximizable(true);
+            frame.setMaximum(true);
             frame.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
             // ignore

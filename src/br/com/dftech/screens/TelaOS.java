@@ -289,7 +289,8 @@ public class TelaOS extends javax.swing.JInternalFrame {
             try {
                 HashMap<String, Object> filtro = new HashMap<>();
                 filtro.put("os", Integer.parseInt(txtOs.getText()));
-                JasperPrint print = JasperFillManager.fillReport("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_os\\relatorio_os.jasper", filtro, conexao);
+                String jasperPath = Moduloconexao.obterCaminhoJasper("relatorio_os", "relatorio_os");
+                JasperPrint print = JasperFillManager.fillReport(jasperPath, filtro, conexao);
                 JasperViewer.viewReport(print, false);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e);

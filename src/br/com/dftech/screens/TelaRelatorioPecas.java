@@ -144,39 +144,14 @@ public class TelaRelatorioPecas extends javax.swing.JInternalFrame {
         new javax.swing.SwingWorker<JasperPrint, Void>() {
             @Override
             protected JasperPrint doInBackground() throws Exception {
-                net.sf.jasperreports.engine.util.JRProperties.setProperty("net.sf.jasperreports.compiler.class", "net.sf.jasperreports.engine.design.JRJavacCompiler");
                 Map<String, Object> params = new HashMap<>();
                 params.put("nome_filtro", filtro.isEmpty() ? null : filtro);
 
-                File f1 = new File("reports/relatorio_pecas/relatorio_pecas.jasper");
-                File f2 = new File("dist/reports/relatorio_pecas/relatorio_pecas.jasper");
-                File f3 = new File("C:\\Users\\dario\\JaspersoftWorkspace\\relatorio_pecas\\relatorio_pecas.jasper");
-
-                String jasperPath = null;
-                if (f1.exists()) jasperPath = f1.getAbsolutePath();
-                else if (f2.exists()) jasperPath = f2.getAbsolutePath();
-                else if (f3.exists()) jasperPath = f3.getAbsolutePath();
-
-                if (jasperPath == null || !new File(jasperPath).exists()) {
-                    File jrxml = new File("reports/relatorio_pecas/relatorio_pecas.jrxml");
-                    if (jrxml.exists()) {
-                        File targetJasper = new File("reports/relatorio_pecas/relatorio_pecas.jasper");
-                        if (!targetJasper.getParentFile().exists()) {
-                            targetJasper.getParentFile().mkdirs();
-                        }
-                        net.sf.jasperreports.engine.JasperCompileManager.compileReportToFile(jrxml.getAbsolutePath(), targetJasper.getAbsolutePath());
-                        jasperPath = targetJasper.getAbsolutePath();
-                    }
-                }
+                String jasperPath = Moduloconexao.obterCaminhoJasper("relatorio_pecas", "relatorio_pecas");
 
                 try (Connection conn = Moduloconexao.conector()) {
                     if (conn == null) throw new Exception("Não foi possível conectar ao banco de dados!");
-
-                    if (jasperPath != null && new File(jasperPath).exists()) {
-                        return JasperFillManager.fillReport(jasperPath, params, conn);
-                    } else {
-                        throw new Exception("Arquivo relatorio_pecas.jasper não foi localizado!");
-                    }
+                    return JasperFillManager.fillReport(jasperPath, params, conn);
                 }
             }
 

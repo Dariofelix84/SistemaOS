@@ -32,4 +32,44 @@ public class Moduloconexao {
             return null;
         }
     }
+
+    public static String obterCaminhoJasper(String folderName, String fileName) throws Exception {
+        net.sf.jasperreports.engine.util.JRProperties.setProperty("net.sf.jasperreports.compiler.class", "net.sf.jasperreports.engine.design.JRJavacCompiler");
+
+        String[] candidateJasperPaths = new String[] {
+            "app/reports/" + folderName + "/" + fileName + ".jasper",
+            "reports/" + folderName + "/" + fileName + ".jasper",
+            "dist/reports/" + folderName + "/" + fileName + ".jasper",
+            "C:\\Users\\dario\\JaspersoftWorkspace\\" + folderName + "\\" + fileName + ".jasper"
+        };
+
+        for (String path : candidateJasperPaths) {
+            java.io.File f = new java.io.File(path);
+            if (f.exists()) {
+                return f.getAbsolutePath();
+            }
+        }
+
+        String[] candidateJrxmlPaths = new String[] {
+            "app/reports/" + folderName + "/" + fileName + ".jrxml",
+            "reports/" + folderName + "/" + fileName + ".jrxml",
+            "dist/reports/" + folderName + "/" + fileName + ".jrxml",
+            "C:\\Users\\dario\\JaspersoftWorkspace\\" + folderName + "\\" + fileName + ".jrxml"
+        };
+
+        for (String jrxmlPath : candidateJrxmlPaths) {
+            java.io.File jrxmlFile = new java.io.File(jrxmlPath);
+            if (jrxmlFile.exists()) {
+                java.io.File targetJasper = new java.io.File("reports/" + folderName + "/" + fileName + ".jasper");
+                if (!targetJasper.getParentFile().exists()) {
+                    targetJasper.getParentFile().mkdirs();
+                }
+                net.sf.jasperreports.engine.JasperCompileManager.compileReportToFile(jrxmlFile.getAbsolutePath(), targetJasper.getAbsolutePath());
+                return targetJasper.getAbsolutePath();
+            }
+        }
+
+        throw new Exception("Arquivo de relatório " + fileName + ".jasper não foi localizado!");
+    }
 }
+

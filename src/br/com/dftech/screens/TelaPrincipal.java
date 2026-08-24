@@ -33,6 +33,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
         // Ícone da janela
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png")).getImage());
         conexao = Moduloconexao.conector();
+
+        java.util.Properties props = Moduloconexao.carregarPropriedades();
+        String dbHost = props.getProperty("host", "localhost");
+        setTitle("DFtech - Sistema OS  |  Servidor: " + dbHost);
         // Relógio digital dinâmico que atualiza a data e hora a cada segundo
         new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
             @Override

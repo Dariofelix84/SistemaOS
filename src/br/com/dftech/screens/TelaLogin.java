@@ -75,21 +75,102 @@ public class TelaLogin extends javax.swing.JFrame {
         }
     }
 
+    public void atualizarStatusConexao() {
+        try {
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
+            }
+        } catch (Exception e) {
+        }
+
+        conexao = Moduloconexao.conector();
+        java.util.Properties props = Moduloconexao.carregarPropriedades();
+        String host = props.getProperty("host", "localhost");
+        if (conexao != null) {
+            lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbconectado.png")));
+            lblStatus.setToolTipText("Conectado ao Banco (" + host + "). Clique para alterar o IP do Servidor.");
+        } else {
+            lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbnaoconectado.png")));
+            lblStatus.setToolTipText("Não Conectado (" + host + ")! Clique para configurar o IP do Servidor.");
+        }
+    }
+
+    private void configurarConexaoRede() {
+        java.util.Properties props = Moduloconexao.carregarPropriedades();
+        String currentHost = props.getProperty("host", "localhost");
+        String currentPort = props.getProperty("port", "5432");
+        String currentDb = props.getProperty("database", "dbinfox");
+        String currentUser = props.getProperty("user", "postgres");
+        String currentPass = props.getProperty("password", "Mae191161");
+
+        javax.swing.JTextField txtHost = new javax.swing.JTextField(currentHost);
+        javax.swing.JTextField txtPort = new javax.swing.JTextField(currentPort);
+        javax.swing.JTextField txtDb = new javax.swing.JTextField(currentDb);
+        javax.swing.JTextField txtUser = new javax.swing.JTextField(currentUser);
+        javax.swing.JPasswordField txtPass = new javax.swing.JPasswordField(currentPass);
+
+        Object[] message = {
+            "IP / Servidor:", txtHost,
+            "Porta:", txtPort,
+            "Nome do Banco:", txtDb,
+            "Usuário:", txtUser,
+            "Senha:", txtPass
+        };
+
+        int option = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                message,
+                "Configuração de Conexão em Rede (PostgreSQL)",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (option == javax.swing.JOptionPane.OK_OPTION) {
+            String newHost = txtHost.getText().trim();
+            String newPort = txtPort.getText().trim();
+            String newDb = txtDb.getText().trim();
+            String newUser = txtUser.getText().trim();
+            String newPass = new String(txtPass.getPassword());
+
+            if (newHost.isEmpty() || newDb.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "IP/Servidor e Nome do Banco não podem ser vazios!");
+                return;
+            }
+
+            try {
+                Connection testConn = Moduloconexao.testarConexao(newHost, newPort, newDb, newUser, newPass);
+                if (testConn != null) {
+                    testConn.close();
+                    props.setProperty("host", newHost);
+                    props.setProperty("port", newPort);
+                    props.setProperty("database", newDb);
+                    props.setProperty("user", newUser);
+                    props.setProperty("password", newPass);
+                    Moduloconexao.salvarPropriedades(props);
+
+                    atualizarStatusConexao();
+                    javax.swing.JOptionPane.showMessageDialog(this, "Conexão estabelecida e salva com sucesso!");
+                }
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Erro ao conectar ao banco:\n" + e.getMessage(), "Falha de Conexão", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     public TelaLogin() {
         initComponents();
         // Ícone da janela
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/x.png")).getImage());
-        conexao = Moduloconexao.conector();
 
-        if (conexao != null) {
+        lblStatus.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblStatus.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                configurarConexaoRede();
+            }
+        });
 
-            lblStatus
-                    .setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbconectado.png")));
-        } else {
-            // lblStatus.setText("Não Conectado");
-            lblStatus.setIcon(
-                    new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbnaoconectado.png")));
-        }
+        atualizarStatusConexao();
     }
 
     /**

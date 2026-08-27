@@ -39,7 +39,263 @@ public class TelaOS extends javax.swing.JInternalFrame {
         txtCliId.setHorizontalAlignment(JTextField.CENTER);
         txtOs.setHorizontalAlignment(JTextField.CENTER);
         MascaraValor.aplicar(txtOsValor);
+        criarTabelaSeNaoExistir();
+        carregarPecasEstoque();
+    }
 
+    private static class PecaItem {
+        private final int idPeca;
+        private final String nomePeca;
+        private final int qtdEstoque;
+        private final double valorPeca;
+
+        public PecaItem(int idPeca, String nomePeca, int qtdEstoque, double valorPeca) {
+            this.idPeca = idPeca;
+            this.nomePeca = nomePeca;
+            this.qtdEstoque = qtdEstoque;
+            this.valorPeca = valorPeca;
+        }
+
+        public int getIdPeca() { return idPeca; }
+        public String getNomePeca() { return nomePeca; }
+        public int getQtdEstoque() { return qtdEstoque; }
+        public double getValorPeca() { return valorPeca; }
+
+        @Override
+        public String toString() {
+            return String.format("%s (R$ %.2f) - Est: %d", nomePeca, valorPeca, qtdEstoque);
+        }
+    }
+
+    private void criarTabelaSeNaoExistir() {
+        if (conexao == null) return;
+        String sql = "CREATE TABLE IF NOT EXISTS tbos_pecas ("
+                   + "id SERIAL PRIMARY KEY, "
+                   + "os INT NOT NULL, "
+                   + "id_peca INT NOT NULL, "
+                   + "qtd INT NOT NULL, "
+                   + "valor_unit NUMERIC(10,2) NOT NULL"
+                   + ");";
+        try (Statement st = conexao.createStatement()) {
+            st.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.err.println("Erro ao criar/verificar tabela tbos_pecas: " + e.getMessage());
+        }
+    }
+
+    private void carregarPecasEstoque() {
+        if (cboPecas == null) return;
+        cboPecas.removeAllItems();
+        if (conexao == null) return;
+        String sql = "SELECT id_peca, nome_peca, qtd_estoque, valor_peca FROM tbpecas ORDER BY nome_peca ASC";
+        try (PreparedStatement pstP = conexao.prepareStatement(sql);
+             ResultSet rsP = pstP.executeQuery()) {
+            while (rsP.next()) {
+                int id = rsP.getInt("id_peca");
+                String nome = rsP.getString("nome_peca");
+                int qtd = rsP.getInt("qtd_estoque");
+                double valor = rsP.getDouble("valor_peca");
+                cboPecas.addItem(new PecaItem(id, nome, qtd, valor));
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar peças do estoque: " + e.getMessage());
+        }
+    }
+
+    private void recalcularValorTotal() {
+        if (tblOsPecas == null) return;
+        javax.swing.table.DefaultTableModel dtm = (javax.swing.table.DefaultTableModel) tblOsPecas.getModel();
+        double totalPecas = 0.0;
+        for (int i = 0; i < dtm.getRowCount(); i++) {
+            try {
+                Object valObj = dtm.getValueAt(i, 4);
+                if (valObj != null) {
+                    totalPecas += Double.parseDouble(valObj.toString());
+                }
+            } catch (NumberFormatException e) {
+                // Ignore formatting errors
+            }
+        }
+        MascaraValor.setValor(txtOsValor, totalPecas);
+    }
+
+    private void adicionarPecaNaOs() {
+        PecaItem item = (PecaItem) cboPecas.getSelectedItem();
+        if (item == null) {
+            JOptionPane.showMessageDialog(null, "Selecione uma peça do estoque!");
+            return;
+        }
+        int qtdDesejada;
+        try {
+            qtdDesejada = Integer.parseInt(txtPecaQtd.getText().trim());
+            if (qtdDesejada <= 0) {
+                JOptionPane.showMessageDialog(null, "Informe uma quantidade maior que zero!");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Quantidade inválida!");
+            return;
+        }
+
+        if (qtdDesejada > item.getQtdEstoque()) {
+            JOptionPane.showMessageDialog(null, "Atenção: Estoque insuficiente! Disponível: " + item.getQtdEstoque());
+            return;
+        }
+
+        javax.swing.table.DefaultTableModel dtm = (javax.swing.table.DefaultTableModel) tblOsPecas.getModel();
+        boolean jaExiste = false;
+        double subtotalAdicional = qtdDesejada * item.getValorPeca();
+
+        for (int i = 0; i < dtm.getRowCount(); i++) {
+            int idInTable = Integer.parseInt(dtm.getValueAt(i, 0).toString());
+            if (idInTable == item.getIdPeca()) {
+                int qtdAtual = Integer.parseInt(dtm.getValueAt(i, 2).toString());
+                int novaQtd = qtdAtual + qtdDesejada;
+                if (novaQtd > item.getQtdEstoque()) {
+                    JOptionPane.showMessageDialog(null, "Atenção: A quantidade total solicitada (" + novaQtd + ") excede o estoque disponível (" + item.getQtdEstoque() + ")!");
+                    return;
+                }
+                double subtotalTotal = novaQtd * item.getValorPeca();
+                dtm.setValueAt(novaQtd, i, 2);
+                dtm.setValueAt(subtotalTotal, i, 4);
+                jaExiste = true;
+                break;
+            }
+        }
+
+        if (!jaExiste) {
+            dtm.addRow(new Object[]{ item.getIdPeca(), item.getNomePeca(), qtdDesejada, item.getValorPeca(), subtotalAdicional });
+        }
+
+        // Somar ao valor que já está no campo Valor Total
+        double valorAtual = MascaraValor.getValor(txtOsValor);
+        MascaraValor.setValor(txtOsValor, valorAtual + subtotalAdicional);
+
+        txtPecaQtd.setText("1");
+    }
+
+    private void removerPecaDaOs() {
+        int linhaSelecionada = tblOsPecas.getSelectedRow();
+        if (linhaSelecionada >= 0) {
+            javax.swing.table.DefaultTableModel dtm = (javax.swing.table.DefaultTableModel) tblOsPecas.getModel();
+            double subtotalRemovido = 0.0;
+            try {
+                Object valObj = dtm.getValueAt(linhaSelecionada, 4);
+                if (valObj != null) {
+                    subtotalRemovido = Double.parseDouble(valObj.toString());
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+
+            dtm.removeRow(linhaSelecionada);
+
+            // Subtrair do valor que já está no campo Valor Total
+            double valorAtual = MascaraValor.getValor(txtOsValor);
+            double novoValor = Math.max(0.0, valorAtual - subtotalRemovido);
+            MascaraValor.setValor(txtOsValor, novoValor);
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecione uma peça na tabela para remover!");
+        }
+    }
+
+    private void salvarPecasOs(int osId) throws SQLException {
+        javax.swing.table.DefaultTableModel dtm = (javax.swing.table.DefaultTableModel) tblOsPecas.getModel();
+        String sqlInsert = "INSERT INTO tbos_pecas (os, id_peca, qtd, valor_unit) VALUES (?, ?, ?, ?)";
+        String sqlUpdateEstoque = "UPDATE tbpecas SET qtd_estoque = qtd_estoque - ? WHERE id_peca = ?";
+
+        for (int i = 0; i < dtm.getRowCount(); i++) {
+            int idPeca = Integer.parseInt(dtm.getValueAt(i, 0).toString());
+            int qtd = Integer.parseInt(dtm.getValueAt(i, 2).toString());
+            double valorUnit = Double.parseDouble(dtm.getValueAt(i, 3).toString());
+
+            try (PreparedStatement pstInsert = conexao.prepareStatement(sqlInsert)) {
+                pstInsert.setInt(1, osId);
+                pstInsert.setInt(2, idPeca);
+                pstInsert.setInt(3, qtd);
+                pstInsert.setDouble(4, valorUnit);
+                pstInsert.executeUpdate();
+            }
+
+            try (PreparedStatement pstEstoque = conexao.prepareStatement(sqlUpdateEstoque)) {
+                pstEstoque.setInt(1, qtd);
+                pstEstoque.setInt(2, idPeca);
+                pstEstoque.executeUpdate();
+            }
+        }
+        carregarPecasEstoque();
+    }
+
+    private void restaurarEstoquePecasOs(int osId) {
+        String sqlSelect = "SELECT id_peca, qtd FROM tbos_pecas WHERE os = ?";
+        String sqlUpdateEstoque = "UPDATE tbpecas SET qtd_estoque = qtd_estoque + ? WHERE id_peca = ?";
+        String sqlDelete = "DELETE FROM tbos_pecas WHERE os = ?";
+
+        try {
+            try (PreparedStatement pstSelect = conexao.prepareStatement(sqlSelect)) {
+                pstSelect.setInt(1, osId);
+                try (ResultSet rsPecas = pstSelect.executeQuery()) {
+                    while (rsPecas.next()) {
+                        int idPeca = rsPecas.getInt("id_peca");
+                        int qtd = rsPecas.getInt("qtd");
+                        try (PreparedStatement pstEstoque = conexao.prepareStatement(sqlUpdateEstoque)) {
+                            pstEstoque.setInt(1, qtd);
+                            pstEstoque.setInt(2, idPeca);
+                            pstEstoque.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            try (PreparedStatement pstDelete = conexao.prepareStatement(sqlDelete)) {
+                pstDelete.setInt(1, osId);
+                pstDelete.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao restaurar estoque de peças da OS " + osId + ": " + e.getMessage());
+        }
+    }
+
+    private void carregarPecasDaOs(int osId) {
+        if (tblOsPecas == null) return;
+        javax.swing.table.DefaultTableModel dtm = (javax.swing.table.DefaultTableModel) tblOsPecas.getModel();
+        dtm.setRowCount(0);
+        String sql = "SELECT op.id_peca, p.nome_peca, op.qtd, op.valor_unit, (op.qtd * op.valor_unit) AS subtotal "
+                   + "FROM tbos_pecas op JOIN tbpecas p ON op.id_peca = p.id_peca "
+                   + "WHERE op.os = ?";
+        try (PreparedStatement pstPecas = conexao.prepareStatement(sql)) {
+            pstPecas.setInt(1, osId);
+            try (ResultSet rsPecas = pstPecas.executeQuery()) {
+                while (rsPecas.next()) {
+                    dtm.addRow(new Object[]{
+                        rsPecas.getInt("id_peca"),
+                        rsPecas.getString("nome_peca"),
+                        rsPecas.getInt("qtd"),
+                        rsPecas.getDouble("valor_unit"),
+                        rsPecas.getDouble("subtotal")
+                    });
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar peças da OS: " + e.getMessage());
+        }
+    }
+
+    private void limparCampos() {
+        txtOs.setText(null);
+        txtData.setText(null);
+        txtCliId.setText(null);
+        txtOsEquip.setText(null);
+        txtOsDef.setText(null);
+        txtOsServ.setText(null);
+        txtOsTec.setText(null);
+        txtOsValor.setText(null);
+        if (tblOsPecas != null && tblOsPecas.getModel() instanceof javax.swing.table.DefaultTableModel) {
+            ((javax.swing.table.DefaultTableModel) tblOsPecas.getModel()).setRowCount(0);
+        }
+        btnOsAdicionar.setEnabled(true);
+        txtCliPesquisar.setEnabled(true);
+        tblClientes.setVisible(true);
     }
 
     private void pesquisar_cliente() {
@@ -129,6 +385,14 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 txtData.setText(sdf.format(dataAtual));
 
+                if (osGerada != null && !osGerada.trim().isEmpty()) {
+                    try {
+                        salvarPecasOs(Integer.parseInt(osGerada.trim()));
+                    } catch (Exception exPecas) {
+                        System.err.println("Erro ao salvar peças da OS: " + exPecas.getMessage());
+                    }
+                }
+
                 btnOsAdicionar.setEnabled(false);
                 txtCliPesquisar.setEnabled(false);
                 tblClientes.setVisible(false);
@@ -179,6 +443,8 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 txtCliPesquisar.setEnabled(false);
                 tblClientes.setVisible(false);
 
+                carregarPecasDaOs(Integer.parseInt(num_os.trim()));
+
             } else {
                 JOptionPane.showMessageDialog(null, "OS não cadastrada");
             }
@@ -205,6 +471,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Número da OS inválido!");
             return;
         }
+        restaurarEstoquePecasOs(osNum);
         double valor = MascaraValor.getValor(txtOsValor);
         String sql = "update tbos set equipamento=?, defeito=?, servico=?, tecnico=?, valor=?, tipo=?, situacao=? where os=?";
         try {
@@ -220,18 +487,9 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
             int adicionado = pst.executeUpdate();
             if (adicionado > 0) {
+                salvarPecasOs(osNum);
                 JOptionPane.showMessageDialog(null, "OS alterada com sucesso");
-                txtOs.setText(null);
-                txtData.setText(null);
-                txtCliId.setText(null);
-                txtOsEquip.setText(null);
-                txtOsDef.setText(null);
-                txtOsServ.setText(null);
-                txtOsTec.setText(null);
-                txtOsValor.setText(null);
-                btnOsAdicionar.setEnabled(true);
-                txtCliPesquisar.setEnabled(true);
-                tblClientes.setVisible(true);
+                limparCampos();
                 txtCliPesquisar.requestFocus();
             }
         } catch (Exception e) {
@@ -253,6 +511,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         }
         int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir esta OS?", "Atenção", JOptionPane.YES_NO_OPTION);
         if (confirma == JOptionPane.YES_OPTION) {
+            restaurarEstoquePecasOs(osNum);
             String sql = "delete from tbos where os=?";
             try {
                 pst = conexao.prepareStatement(sql);
@@ -260,18 +519,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 int apagado = pst.executeUpdate();
                 if (apagado > 0) {
                     JOptionPane.showMessageDialog(null, "OS excluída com sucesso");
-
-                    txtOs.setText(null);
-                    txtData.setText(null);
-                    txtCliId.setText(null);
-                    txtOsEquip.setText(null);
-                    txtOsDef.setText(null);
-                    txtOsServ.setText(null);
-                    txtOsTec.setText(null);
-                    txtOsValor.setText(null);
-                    btnOsAdicionar.setEnabled(true);
-                    txtCliPesquisar.setEnabled(true);
-                    tblClientes.setVisible(true);
+                    limparCampos();
                 }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e);
@@ -336,6 +584,16 @@ public class TelaOS extends javax.swing.JInternalFrame {
         btnOsExluir = new javax.swing.JButton();
         btnOsImprimir = new javax.swing.JButton();
 
+        jPanelPecas = new javax.swing.JPanel();
+        jLabelPeca = new javax.swing.JLabel();
+        cboPecas = new javax.swing.JComboBox<>();
+        jLabelQtd = new javax.swing.JLabel();
+        txtPecaQtd = new javax.swing.JTextField();
+        btnAdicionarPeca = new javax.swing.JButton();
+        btnRemoverPeca = new javax.swing.JButton();
+        jScrollPaneOsPecas = new javax.swing.JScrollPane();
+        tblOsPecas = new javax.swing.JTable();
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -353,8 +611,8 @@ public class TelaOS extends javax.swing.JInternalFrame {
         setResizable(true);
         setTitle("Ordem de Serviços");
         setName("OS"); // NOI18N
-        setMinimumSize(new java.awt.Dimension(640, 480));
-        setPreferredSize(new java.awt.Dimension(640, 480));
+        setMinimumSize(new java.awt.Dimension(640, 620));
+        setPreferredSize(new java.awt.Dimension(640, 620));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -619,6 +877,82 @@ public class TelaOS extends javax.swing.JInternalFrame {
             }
         });
 
+        jPanelPecas.setBorder(javax.swing.BorderFactory.createTitledBorder("Peças Utilizadas do Estoque"));
+
+        jLabelPeca.setText("Peça:");
+        jLabelQtd.setText("Qtd:");
+
+        txtPecaQtd.setText("1");
+        txtPecaQtd.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        btnAdicionarPeca.setText("Adicionar Peça");
+        btnAdicionarPeca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAdicionarPecaActionPerformed(evt);
+            }
+        });
+
+        btnRemoverPeca.setText("Remover Peça");
+        btnRemoverPeca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverPecaActionPerformed(evt);
+            }
+        });
+
+        tblOsPecas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {},
+            new String [] {
+                "Id Peça", "Peça", "Qtd", "Valor Unit. (R$)", "Subtotal (R$)"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPaneOsPecas.setViewportView(tblOsPecas);
+
+        javax.swing.GroupLayout jPanelPecasLayout = new javax.swing.GroupLayout(jPanelPecas);
+        jPanelPecas.setLayout(jPanelPecasLayout);
+        jPanelPecasLayout.setHorizontalGroup(
+            jPanelPecasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelPecasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelPecasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPaneOsPecas)
+                    .addGroup(jPanelPecasLayout.createSequentialGroup()
+                        .addComponent(jLabelPeca)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cboPecas, 0, 240, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabelQtd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtPecaQtd, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnAdicionarPeca)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRemoverPeca)))
+                .addContainerGap())
+        );
+        jPanelPecasLayout.setVerticalGroup(
+            jPanelPecasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelPecasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelPecasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelPeca)
+                    .addComponent(cboPecas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelQtd)
+                    .addComponent(txtPecaQtd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAdicionarPeca)
+                    .addComponent(btnRemoverPeca))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPaneOsPecas, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -626,6 +960,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelPecas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -704,17 +1039,19 @@ public class TelaOS extends javax.swing.JInternalFrame {
                     .addComponent(jLabel10)
                     .addComponent(txtOsValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanelPecas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnOsPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnOsAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnOsAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnOsExluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnOsImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        setBounds(0, 0, 640, 480);
+        setBounds(0, 0, 640, 640);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtOsValorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtOsValorActionPerformed
@@ -807,14 +1144,24 @@ public class TelaOS extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnOsImprimirKeyPressed
 
+    private void btnAdicionarPecaActionPerformed(java.awt.event.ActionEvent evt) {
+        adicionarPecaNaOs();
+    }
+
+    private void btnRemoverPecaActionPerformed(java.awt.event.ActionEvent evt) {
+        removerPecaDaOs();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdicionarPeca;
     private javax.swing.JButton btnOsAdicionar;
     private javax.swing.JButton btnOsAlterar;
     private javax.swing.JButton btnOsExluir;
     private javax.swing.JButton btnOsImprimir;
     private javax.swing.JButton btnOsPesquisar;
+    private javax.swing.JButton btnRemoverPeca;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JComboBox<PecaItem> cboPecas;
     private javax.swing.JComboBox<String> cboOsSit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -826,13 +1173,18 @@ public class TelaOS extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelPeca;
+    private javax.swing.JLabel jLabelQtd;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanelPecas;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPaneOsPecas;
     private javax.swing.JRadioButton rbtOrc;
     private javax.swing.JRadioButton rbtOs;
     private javax.swing.JTable tblClientes;
+    private javax.swing.JTable tblOsPecas;
     private javax.swing.JTextField txtCliId;
     public static javax.swing.JTextField txtCliPesquisar;
     private javax.swing.JTextField txtData;
@@ -842,5 +1194,6 @@ public class TelaOS extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtOsServ;
     private javax.swing.JTextField txtOsTec;
     private javax.swing.JFormattedTextField txtOsValor;
+    private javax.swing.JTextField txtPecaQtd;
     // End of variables declaration//GEN-END:variables
 }

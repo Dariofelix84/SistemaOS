@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorio_os" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e09c85be-bde8-48b0-8dbb-a81d09e86333">
+	<subDataset name="DatasetPecasFoto" uuid="a7b8c9d0-1234-5678-90ab-cdef12345678">
+		<parameter name="os_id" class="java.lang.Integer"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT p.nome_peca, op.qtd, p.foto_peca FROM tbos_pecas op JOIN tbpecas p ON op.id_peca = p.id_peca WHERE op.os = $P{os_id} AND p.foto_peca IS NOT NULL]]>
+		</queryString>
+		<field name="nome_peca" class="java.lang.String"/>
+		<field name="qtd" class="java.lang.Integer"/>
+		<field name="foto_peca" class="java.lang.Object"/>
+	</subDataset>
 	<parameter name="os" class="java.lang.Integer"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT tbos.os, tbos.data_os, tbos.tipo, tbos.situacao, tbos.equipamento, tbos.defeito, tbos.servico, tbos.tecnico, tbos.valor,
@@ -187,15 +196,38 @@ WHERE tbos.os = $P{os}]]>
 	<columnFooter>
 		<band height="180" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="5" width="150" height="20" uuid="d9a86946-95ea-4430-b3ed-5555227f02ed"/>
+				<reportElement x="0" y="5" width="250" height="20" uuid="d9a86946-95ea-4430-b3ed-5555227f02ed"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Observações]]></text>
+				<text><![CDATA[Observações / Peças Utilizadas:]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement x="0" y="25" width="555" height="140" uuid="546e99c1-90f6-4717-9742-91af714a00ab"/>
 			</rectangle>
+			<componentElement>
+				<reportElement x="5" y="30" width="545" height="130" uuid="f9876543-2109-8765-4321-098765432109"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal">
+					<datasetRun subDataset="DatasetPecasFoto" uuid="12345678-90ab-cdef-1234-567890abcdef">
+						<datasetParameter name="os_id">
+							<datasetParameterExpression><![CDATA[$F{os}]]></datasetParameterExpression>
+						</datasetParameter>
+					</datasetRun>
+					<jr:listContents height="130" width="105">
+						<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle">
+							<reportElement x="5" y="5" width="95" height="90" uuid="e8765432-1098-7654-3210-987654321098"/>
+							<imageExpression><![CDATA[new java.io.ByteArrayInputStream((byte[])$F{foto_peca})]]></imageExpression>
+						</image>
+						<textField isBlankWhenNull="true" isStretchWithOverflow="true">
+							<reportElement x="2" y="96" width="101" height="30" uuid="d7654321-0987-6543-2109-876543210987"/>
+							<textElement textAlignment="Center">
+								<font size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{nome_peca} + "\n(" + $F{qtd} + "x)"]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
 		</band>
 	</columnFooter>
 	<pageFooter>

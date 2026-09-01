@@ -87,10 +87,12 @@ public class TelaLogin extends javax.swing.JFrame {
         java.util.Properties props = Moduloconexao.carregarPropriedades();
         String host = props.getProperty("host", "localhost");
         if (conexao != null) {
-            lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbconectado.png")));
+            lblStatus
+                    .setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbconectado.png")));
             lblStatus.setToolTipText("Conectado ao Banco (" + host + "). Clique para alterar o IP do Servidor.");
         } else {
-            lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbnaoconectado.png")));
+            lblStatus.setIcon(
+                    new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/dbnaoconectado.png")));
             lblStatus.setToolTipText("Não Conectado (" + host + ")! Clique para configurar o IP do Servidor.");
         }
     }
@@ -110,11 +112,11 @@ public class TelaLogin extends javax.swing.JFrame {
         javax.swing.JPasswordField txtPass = new javax.swing.JPasswordField(currentPass);
 
         Object[] message = {
-            "IP / Servidor:", txtHost,
-            "Porta:", txtPort,
-            "Nome do Banco:", txtDb,
-            "Usuário:", txtUser,
-            "Senha:", txtPass
+                "IP / Servidor:", txtHost,
+                "Porta:", txtPort,
+                "Nome do Banco:", txtDb,
+                "Usuário:", txtUser,
+                "Senha:", txtPass
         };
 
         int option = javax.swing.JOptionPane.showConfirmDialog(
@@ -122,8 +124,7 @@ public class TelaLogin extends javax.swing.JFrame {
                 message,
                 "Configuração de Conexão em Rede (PostgreSQL)",
                 javax.swing.JOptionPane.OK_CANCEL_OPTION,
-                javax.swing.JOptionPane.QUESTION_MESSAGE
-        );
+                javax.swing.JOptionPane.QUESTION_MESSAGE);
 
         if (option == javax.swing.JOptionPane.OK_OPTION) {
             String newHost = txtHost.getText().trim();
@@ -152,7 +153,8 @@ public class TelaLogin extends javax.swing.JFrame {
                     javax.swing.JOptionPane.showMessageDialog(this, "Conexão estabelecida e salva com sucesso!");
                 }
             } catch (Exception e) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Erro ao conectar ao banco:\n" + e.getMessage(), "Falha de Conexão", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(this, "Erro ao conectar ao banco:\n" + e.getMessage(),
+                        "Falha de Conexão", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -244,10 +246,14 @@ public class TelaLogin extends javax.swing.JFrame {
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(txtUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
-                                                .addComponent(txtSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE))
-                                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addComponent(txtUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 220,
+                                                        Short.MAX_VALUE)
+                                                .addComponent(txtSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 220,
+                                                        Short.MAX_VALUE))
+                                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 90,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(40, Short.MAX_VALUE)));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -70,6 +70,10 @@ public class TelaPeca extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnPecaLimpar;
     private javax.swing.JButton btnCarregarFoto;
     private javax.swing.JButton btnRemoverFoto;
+    private javax.swing.JLabel lblPecaAdicionar;
+    private javax.swing.JLabel lblPecaAlterar;
+    private javax.swing.JLabel lblPecaRemover;
+    private javax.swing.JLabel lblPecaLimpar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -274,8 +278,8 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                 ByteArrayInputStream bais = new ByteArrayInputStream(imgBytes);
                 BufferedImage img = ImageIO.read(bais);
                 if (img != null) {
-                    int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 140;
-                    int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 140;
+                    int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 200;
+                    int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 200;
                     lblFoto.setIcon(redimensionarImagem(img, w, h));
                     lblFoto.setText(null);
                 } else {
@@ -482,8 +486,8 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                                 ps.setInt(i + 1, chunk.get(i));
                             }
                             try (ResultSet r = ps.executeQuery()) {
-                                int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 140;
-                                int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 140;
+                                int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 200;
+                                int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 200;
 
                                 while (r.next()) {
                                     if (isCancelled()) break;
@@ -608,8 +612,8 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                                     ByteArrayInputStream bais = new ByteArrayInputStream(imgBytes);
                                     BufferedImage img = ImageIO.read(bais);
                                     if (img != null) {
-                                        int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 140;
-                                        int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 140;
+                                        int w = lblFoto.getWidth() > 0 ? lblFoto.getWidth() : 200;
+                                        int h = lblFoto.getHeight() > 0 ? lblFoto.getHeight() : 200;
                                         ImageIcon icon = redimensionarImagem(img, w, h);
                                         return new CachedFoto(imgBytes, icon);
                                     }
@@ -957,6 +961,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         lblFoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblFoto.setText("Sem Foto");
         lblFoto.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblFoto.setPreferredSize(new java.awt.Dimension(200, 200));
 
         btnCarregarFoto.setText("Foto...");
         btnCarregarFoto.addActionListener(new java.awt.event.ActionListener() {
@@ -1050,6 +1055,18 @@ public class TelaPeca extends javax.swing.JInternalFrame {
             }
         });
 
+        lblPecaAdicionar = new javax.swing.JLabel("Adicionar", javax.swing.SwingConstants.CENTER);
+        lblPecaAdicionar.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+
+        lblPecaAlterar = new javax.swing.JLabel("Alterar", javax.swing.SwingConstants.CENTER);
+        lblPecaAlterar.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+
+        lblPecaRemover = new javax.swing.JLabel("Excluir", javax.swing.SwingConstants.CENTER);
+        lblPecaRemover.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+
+        lblPecaLimpar = new javax.swing.JLabel("Limpar", javax.swing.SwingConstants.CENTER);
+        lblPecaLimpar.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+
         // Layout de Grupos (GroupLayout) combinando com as telas existentes
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1081,17 +1098,25 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                                     .addComponent(txtPecaQtd, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtPecaValor, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(30, 30, 30)
-                                .addComponent(btnPecaAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(20, 20, 20)
-                                .addComponent(btnPecaAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(20, 20, 20)
-                                .addComponent(btnPecaRemover, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(20, 20, 20)
-                                .addComponent(btnPecaLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                                .addGap(15, 15, 15)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                    .addComponent(btnPecaAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPecaAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(15, 15, 15)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                    .addComponent(btnPecaAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPecaAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(15, 15, 15)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                    .addComponent(btnPecaRemover, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPecaRemover, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(15, 15, 15)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                    .addComponent(btnPecaLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPecaLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(30, 30, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                            .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnCarregarFoto)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1130,12 +1155,24 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                             .addComponent(txtPecaValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(20, 20, 20)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnPecaAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnPecaAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnPecaRemover, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnPecaLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnPecaAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblPecaAdicionar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnPecaAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblPecaAlterar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnPecaRemover, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblPecaRemover))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnPecaLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblPecaLimpar))))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnCarregarFoto)

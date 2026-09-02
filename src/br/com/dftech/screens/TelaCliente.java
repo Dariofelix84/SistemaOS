@@ -381,7 +381,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                                                 .addGroup(layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addComponent(txtCliId, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                40, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliFone,
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE, 140,
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -394,31 +394,37 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                                                                 420, Short.MAX_VALUE)
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addGap(20, 20, 20)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnCliAdicionar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblCliAdicionar,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(40, 40, 40)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnCliAlterar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblCliAlterar,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(40, 40, 40)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnCliRemover,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblCliRemover,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))))))
                                 .addGap(20, 20, 20)));
         layout.setVerticalGroup(

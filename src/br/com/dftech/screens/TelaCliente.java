@@ -386,12 +386,12 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE, 110,
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliNome, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                420, Short.MAX_VALUE)
+                                                                320, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliEndereco,
                                                                 javax.swing.GroupLayout.DEFAULT_SIZE, 420,
-                                                                Short.MAX_VALUE)
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliEmail, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                420, Short.MAX_VALUE)
+                                                                300, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addGap(20, 20, 20)
                                                                 .addGroup(layout.createParallelGroup(

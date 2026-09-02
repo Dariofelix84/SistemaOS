@@ -998,6 +998,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         lblFoto.setPreferredSize(new java.awt.Dimension(200, 200));
 
         btnCarregarFoto.setText("Foto...");
+        btnCarregarFoto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCarregarFoto.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1006,6 +1007,7 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         });
 
         btnRemoverFoto.setText("Remover");
+        btnRemoverFoto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRemoverFoto.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1014,9 +1016,9 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         });
 
         btnPecaAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/create.png")));
-        btnPecaAdicionar.setToolTipText("Adicionar Peça");
+        btnPecaAdicionar.setToolTipText("Adicionar");
         btnPecaAdicionar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnPecaAdicionar.setPreferredSize(new java.awt.Dimension(70, 70));
+        btnPecaAdicionar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnPecaAdicionar.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1033,9 +1035,9 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         });
 
         btnPecaAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/update.png")));
-        btnPecaAlterar.setToolTipText("Alterar Peça");
+        btnPecaAlterar.setToolTipText("Alterar");
         btnPecaAlterar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnPecaAlterar.setPreferredSize(new java.awt.Dimension(70, 70));
+        btnPecaAlterar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnPecaAlterar.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1052,9 +1054,9 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         });
 
         btnPecaRemover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/delete.png")));
-        btnPecaRemover.setToolTipText("Remover Peça");
+        btnPecaRemover.setToolTipText("Remover");
         btnPecaRemover.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnPecaRemover.setPreferredSize(new java.awt.Dimension(70, 70));
+        btnPecaRemover.setPreferredSize(new java.awt.Dimension(80, 80));
         btnPecaRemover.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1071,9 +1073,9 @@ public class TelaPeca extends javax.swing.JInternalFrame {
         });
 
         btnPecaLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/read.png")));
-        btnPecaLimpar.setToolTipText("Limpar Campos");
+        btnPecaLimpar.setToolTipText("Limpar");
         btnPecaLimpar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnPecaLimpar.setPreferredSize(new java.awt.Dimension(70, 70));
+        btnPecaLimpar.setPreferredSize(new java.awt.Dimension(80, 80));
         btnPecaLimpar.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1155,44 +1157,44 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                                                                         javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnPecaAdicionar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblPecaAdicionar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(15, 15, 15)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnPecaAlterar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblPecaAlterar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(15, 15, 15)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnPecaRemover,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblPecaRemover,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(15, 15, 15)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnPecaLimpar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblPecaLimpar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                70,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))))
                                                 .addGap(30, 30, Short.MAX_VALUE)
                                                 .addGroup(layout
@@ -1258,28 +1260,32 @@ public class TelaPeca extends javax.swing.JInternalFrame {
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(btnPecaAdicionar,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(lblPecaAdicionar))
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(btnPecaAlterar,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(lblPecaAlterar))
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(btnPecaRemover,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(lblPecaRemover))
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(btnPecaLimpar,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)

@@ -383,7 +383,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                                                         .addComponent(txtCliId, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliFone,
-                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 140,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 110,
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(txtCliNome, javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                 420, Short.MAX_VALUE)

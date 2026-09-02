@@ -117,6 +117,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         }
     }
 
+    @SuppressWarnings("unused")
     private void recalcularValorTotal() {
         if (tblOsPecas == null)
             return;
@@ -949,11 +950,22 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 btnAdicionarPecaActionPerformed(evt);
             }
         });
+        btnAdicionarPeca.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnAdicionarPecaKeyPressed(evt);
+            }
+        });
 
         btnRemoverPeca.setText("Remover Peça");
         btnRemoverPeca.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRemoverPecaActionPerformed(evt);
+            }
+        });
+
+        btnRemoverPeca.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnRemoverPecaKeyPressed(evt);
             }
         });
 
@@ -1058,53 +1070,63 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                                 .addGroup(layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnOsAdicionar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsAdicionar,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnOsPesquisar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsPesquisar,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnOsAlterar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsAlterar,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnOsExluir,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsExcluir,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                                .addGroup(layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnOsImprimir,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsImprimir,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 80,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGap(0, 0, Short.MAX_VALUE))
                                                         .addGroup(layout.createSequentialGroup()
@@ -1309,8 +1331,20 @@ public class TelaOS extends javax.swing.JInternalFrame {
         adicionarPecaNaOs();
     }
 
+    private void btnAdicionarPecaKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            adicionarPecaNaOs();
+        }
+    }
+
     private void btnRemoverPecaActionPerformed(java.awt.event.ActionEvent evt) {
         removerPecaDaOs();
+    }
+
+    private void btnRemoverPecaKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            removerPecaDaOs();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

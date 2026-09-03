@@ -1332,7 +1332,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
     }
 
     private void btnAdicionarPecaKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             adicionarPecaNaOs();
         }
     }
@@ -1342,7 +1342,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
     }
 
     private void btnRemoverPecaKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             removerPecaDaOs();
         }
     }

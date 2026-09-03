@@ -35,6 +35,8 @@ jpackage ^
   --win-shortcut ^
   --win-menu ^
   --win-dir-chooser ^
+  --win-upgrade-uuid "a4b5c6d7-e8f9-4d11-a213-141516171819" ^
+  --resource-dir "wix_resources" ^
   --java-options "--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
 
 if %errorlevel% equ 0 (

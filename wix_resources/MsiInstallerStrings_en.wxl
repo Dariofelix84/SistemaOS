@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252">
+  <String Id="MainFeatureTitle">SistemaOS</String>
+  <String Id="DowngradeErrorMessage">Uma versão mais recente do [ProductName] já está instalada. A instalação foi encerrada.</String>
+  <String Id="DisallowUpgradeErrorMessage">Uma versão anterior do [ProductName] já está instalada. As atualizações estão desativadas.</String>
+
+  <String Id="ShortcutPromptDlg_Title">Instalador do [ProductName]</String>
+  <String Id="ShortcutPromptDlgTitle">{\WixUI_Font_Title}Atalhos</String>
+  <String Id="ShortcutPromptDlgBannerBitmap">WixUI_Bmp_Banner</String>
+  <String Id="ShortcutPromptDlgDescription">Selecione onde deseja criar os atalhos do aplicativo.</String>
+  <String Id="ShortcutPromptDlgDesktopShortcutControlLabel">Criar atalho na Área de Trabalho</String>
+  <String Id="ShortcutPromptDlgStartMenuShortcutControlLabel">Criar atalho no Menu Iniciar</String>
+
+  <String Id="InstallDirNotEmptyDlg_Title">Instalador do [ProductName]</String>
+  <String Id="InstallDirNotEmptyDlgInstallDirExistMessage">A pasta [INSTALLDIR] já existe. A versão antiga será desinstalada e a nova versão será instalada nesta pasta. Deseja continuar?</String>
+
+  <String Id="ContextMenuCommandLabel">Abrir com [ProductName]</String>
+</WixLocalization>

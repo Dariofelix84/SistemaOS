@@ -2,14 +2,30 @@
 setlocal
 cd /d "%~dp0"
 
+:: ============================================================
+::  CONFIGURACAO DE VERSAO
+::  Altere o valor abaixo para cada nova versao do SistemaOS.
+::  IMPORTANTE: Ao incrementar a versao (ex: 1.0.0 -> 1.1.0),
+::  o instalador vai automaticamente desinstalar a versao
+::  anterior e instalar a nova.
+:: ============================================================
+set "APP_VERSION=1.0.0"
+
+echo.
+echo ========================================================
+echo  Gerador de Instalador MSI - SistemaOS v%APP_VERSION%
+echo  Idioma: Portugues do Brasil (pt-BR)
+echo ========================================================
+echo.
+
 echo [1/4] Adicionando WiX Toolset ao PATH...
 set "PATH=C:\Program Files (x86)\WiX Toolset v3.14\bin;C:\Program Files (x86)\WiX Toolset v3.11\bin;%PATH%"
 
 echo [2/4] Compilando fontes Java e gerando dist\Dftech.jar...
 if not exist "build\classes" mkdir "build\classes"
-javac -encoding UTF-8 -cp "dist\lib\*;src" -d build\classes src\br\com\dftech\dal\*.java src\br\com\dftech\screens\*.java
+javac -encoding UTF-8 -cp "dist\lib\*;src" -d build\classes src\br\com\dftech\dal\*.java src\br\com\dftech\screens\*.java src\br\com\dftech\utils\*.java
 if %errorlevel% neq 0 (
-    echo Erro ao compilar os fontes Java.
+    echo ERRO: Falha ao compilar os fontes Java.
     exit /b %errorlevel%
 )
 
@@ -21,11 +37,13 @@ echo [3/4] Criando pasta de destino na Area de Trabalho...
 set "OUTPUT_DIR=%USERPROFILE%\Desktop\Instalador_SistemaOS"
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
-echo [4/4] Executando jpackage para gerar o instalador .MSI...
+echo [4/4] Executando jpackage para gerar o instalador .MSI (pt-BR)...
+echo       Versao: %APP_VERSION%
+echo.
 jpackage ^
   --type msi ^
   --name "SistemaOS" ^
-  --app-version "1.0.0" ^
+  --app-version "%APP_VERSION%" ^
   --vendor "DFtech" ^
   --dest "%OUTPUT_DIR%" ^
   --input "dist" ^
@@ -37,15 +55,24 @@ jpackage ^
   --win-dir-chooser ^
   --win-upgrade-uuid "a4b5c6d7-e8f9-4d11-a213-141516171819" ^
   --resource-dir "wix_resources" ^
-  --java-options "--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+  --java-options "--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED" ^
+  --verbose
 
 if %errorlevel% equ 0 (
     echo.
     echo ========================================================
     echo  Instalador MSI gerado com sucesso!
-    echo  Local do instalador: %OUTPUT_DIR%
+    echo  Versao: %APP_VERSION%
+    echo  Idioma: Portugues do Brasil
+    echo  Local: %OUTPUT_DIR%
+    echo ========================================================
+    echo.
+    echo  DICA: Para gerar uma atualizacao, altere APP_VERSION
+    echo  no topo deste script e execute novamente.
+    echo  A versao anterior sera desinstalada automaticamente.
     echo ========================================================
 ) else (
     echo.
-    echo Ocorreu um erro durante a geracao do instalador.
+    echo ERRO: Ocorreu um erro durante a geracao do instalador.
+    echo Verifique as mensagens acima para mais detalhes.
 )

@@ -632,8 +632,8 @@ public class TelaOS extends javax.swing.JInternalFrame {
         setResizable(true);
         setTitle("Ordem de Serviços");
         setName("OS"); // NOI18N
-        setMinimumSize(new java.awt.Dimension(640, 620));
-        setPreferredSize(new java.awt.Dimension(640, 620));
+        setMinimumSize(new java.awt.Dimension(640, 640));
+        setPreferredSize(new java.awt.Dimension(640, 640));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -826,7 +826,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap()));
 
         jLabel6.setText("* Equipamento");
@@ -945,6 +945,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         txtPecaQtd.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         btnAdicionarPeca.setText("Adicionar Peça");
+        btnAdicionarPeca.setMargin(new java.awt.Insets(2, 4, 2, 4));
         btnAdicionarPeca.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAdicionarPecaActionPerformed(evt);
@@ -957,6 +958,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
         });
 
         btnRemoverPeca.setText("Remover Peça");
+        btnRemoverPeca.setMargin(new java.awt.Insets(2, 4, 2, 4));
         btnRemoverPeca.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRemoverPecaActionPerformed(evt);
@@ -996,7 +998,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                         .addGroup(jPanelPecasLayout.createSequentialGroup()
                                                 .addComponent(jLabelPeca)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(cboPecas, 0, 240, Short.MAX_VALUE)
+                                                .addComponent(cboPecas, 0, 150, Short.MAX_VALUE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jLabelQtd)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1024,7 +1026,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                         .addComponent(btnAdicionarPeca)
                                         .addComponent(btnRemoverPeca))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPaneOsPecas, javax.swing.GroupLayout.PREFERRED_SIZE, 110,
+                                .addComponent(jScrollPaneOsPecas, javax.swing.GroupLayout.PREFERRED_SIZE, 75,
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
@@ -1090,7 +1092,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addComponent(lblOsPesquisar,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                80,
+                                                                                65,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1234,7 +1236,7 @@ public class TelaOS extends javax.swing.JInternalFrame {
                                                 .addComponent(lblOsImprimir)))
                                 .addContainerGap(15, Short.MAX_VALUE)));
 
-        setBounds(0, 0, 640, 640);
+        setBounds(0, 0, 640, 650);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtOsValorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtOsValorActionPerformed

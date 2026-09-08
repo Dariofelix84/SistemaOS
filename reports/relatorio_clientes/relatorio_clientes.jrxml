@@ -31,8 +31,11 @@
 	</background>
 	<title>
 		<band height="64" splitType="Stretch">
-			<textField pattern="dd, MMMMM yyyy">
-				<reportElement x="460" y="0" width="100" height="30" uuid="d9a86946-95ea-4430-b3ed-5555227f02ed"/>
+			<textField pattern="dd/MM/yyyy HH:mm">
+				<reportElement x="433" y="0" width="122" height="30" uuid="d9a86946-95ea-4430-b3ed-5555227f02ed"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>

@@ -41,8 +41,11 @@ ORDER BY nome_peca ASC]]>
 	</background>
 	<title>
 		<band height="58" splitType="Stretch">
-			<textField pattern="dd, MMMMM yyyy">
-				<reportElement x="701" y="0" width="100" height="30" uuid="8d8aa881-4e9b-4445-92dc-bd8c4ac7d795"/>
+			<textField pattern="dd/MM/yyyy HH:mm">
+				<reportElement x="680" y="0" width="122" height="30" uuid="8d8aa881-4e9b-4445-92dc-bd8c4ac7d795"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>

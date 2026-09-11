@@ -9,7 +9,7 @@ cd /d "%~dp0"
 ::  o instalador vai automaticamente desinstalar a versao
 ::  anterior e instalar a nova.
 :: ============================================================
-set "APP_VERSION=1.0.0"
+set "APP_VERSION=1.0.1"
 
 echo.
 echo ========================================================

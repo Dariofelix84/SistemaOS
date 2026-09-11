@@ -9,6 +9,7 @@ import br.com.dftech.dal.Moduloconexao;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import net.proteanit.sql.DbUtils;
 
 public class TelaUsuario extends javax.swing.JInternalFrame {
 
@@ -23,21 +24,96 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         initComponents();
         conexao = Moduloconexao.conector();
         txtUsuId.setHorizontalAlignment(JTextField.CENTER);
+        pesquisarUsuario();
+    }
+
+    private void pesquisarUsuario() {
+        String sql = "select iduser as ID, usuario as Nome, fone as Fone, login as Login, perfil as Perfil from tbusuarios where lower(usuario) like ? order by usuario";
+        try {
+            if (conexao == null || conexao.isClosed()) {
+                conexao = Moduloconexao.conector();
+            }
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, "%" + txtUsuPesquisar.getText().toLowerCase() + "%");
+
+            rs = pst.executeQuery();
+            tblUsuarios.setModel(DbUtils.resultSetToTableModel(rs));
+            configurarLarguraColunasTabela();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void configurarLarguraColunasTabela() {
+        if (tblUsuarios.getColumnCount() >= 5) {
+            tblUsuarios.getColumnModel().getColumn(0).setPreferredWidth(50);
+            tblUsuarios.getColumnModel().getColumn(0).setMaxWidth(60);
+            tblUsuarios.getColumnModel().getColumn(0).setMinWidth(40);
+
+            javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+            tblUsuarios.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+            tblUsuarios.getColumnModel().getColumn(1).setPreferredWidth(180);
+            tblUsuarios.getColumnModel().getColumn(2).setPreferredWidth(110);
+            tblUsuarios.getColumnModel().getColumn(3).setPreferredWidth(120);
+            tblUsuarios.getColumnModel().getColumn(4).setPreferredWidth(80);
+        }
+    }
+
+    public void setarCampos() {
+        int setar = tblUsuarios.getSelectedRow();
+        if (setar < 0)
+            return;
+
+        String userIdStr = tblUsuarios.getModel().getValueAt(setar, 0).toString();
+        String sql = "select * from tbusuarios where iduser=?";
+        try {
+            if (conexao == null || conexao.isClosed()) {
+                conexao = Moduloconexao.conector();
+            }
+            pst = conexao.prepareStatement(sql);
+            pst.setInt(1, Integer.parseInt(userIdStr));
+            rs = pst.executeQuery();
+            if (rs.next()) {
+                txtUsuId.setText(rs.getString(1));
+                txtUsuNome.setText(rs.getString(2));
+                txtUsuFone.setText(rs.getString(3));
+                txtUsuLogin.setText(rs.getString(4));
+                txtUsuSenha.setText(rs.getString(5));
+                cboUsuPerfil.setSelectedItem(rs.getString(6));
+                btnUsuCreate.setEnabled(false);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
     }
 
     private void consultar() {
-        String sql = "select * from tbusuarios where iduser=?";
-        try {
-            if (txtUsuId.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Preencha o ID do usuário!");
+        if (txtUsuId.getText().trim().isEmpty()) {
+            if (!txtUsuPesquisar.getText().trim().isEmpty() || !txtUsuNome.getText().trim().isEmpty()) {
+                if (txtUsuPesquisar.getText().trim().isEmpty()) {
+                    txtUsuPesquisar.setText(txtUsuNome.getText().trim());
+                }
+                pesquisarUsuario();
                 return;
             }
+            JOptionPane.showMessageDialog(null, "Preencha o ID ou o Nome do usuário para consultar!");
+            return;
+        }
+
+        String sql = "select * from tbusuarios where iduser=?";
+        try {
             int userId;
             try {
-                userId = Integer.parseInt(txtUsuId.getText());
+                userId = Integer.parseInt(txtUsuId.getText().trim());
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "O ID deve ser um número inteiro!");
                 return;
+            }
+            if (conexao == null || conexao.isClosed()) {
+                conexao = Moduloconexao.conector();
             }
             pst = conexao.prepareStatement(sql);
 
@@ -58,7 +134,6 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 txtUsuFone.setText(null);
                 txtUsuLogin.setText(null);
                 txtUsuSenha.setText(null);
-                // cboUsuPerfil.setSelectedItem(null);
                 txtUsuNome.requestFocus();
                 btnUsuCreate.setEnabled(true);
             }
@@ -92,6 +167,8 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         txtUsuLogin.setText(null);
         txtUsuSenha.setText(null);
         cboUsuPerfil.setSelectedIndex(0);
+        txtUsuPesquisar.setText(null);
+        pesquisarUsuario();
         btnUsuCreate.setEnabled(true);
         txtUsuNome.requestFocus();
     }
@@ -114,6 +191,9 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "O ID deve ser um número inteiro!");
                 return;
             }
+            if (conexao == null || conexao.isClosed()) {
+                conexao = Moduloconexao.conector();
+            }
             pst = conexao.prepareStatement(sql);
             pst.setInt(1, userId);
             pst.setString(2, txtUsuNome.getText());
@@ -130,6 +210,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 txtUsuFone.setText(null);
                 txtUsuLogin.setText(null);
                 txtUsuSenha.setText(null);
+                pesquisarUsuario();
                 txtUsuId.requestFocus();
             }
 
@@ -153,6 +234,9 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "O ID deve ser um número inteiro!");
                 return;
             }
+            if (conexao == null || conexao.isClosed()) {
+                conexao = Moduloconexao.conector();
+            }
             pst = conexao.prepareStatement(sql);
             pst.setString(1, txtUsuNome.getText());
             pst.setString(2, txtUsuFone.getText());
@@ -169,6 +253,8 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 txtUsuFone.setText(null);
                 txtUsuLogin.setText(null);
                 txtUsuSenha.setText(null);
+                btnUsuCreate.setEnabled(true);
+                pesquisarUsuario();
                 txtUsuId.requestFocus();
             }
 
@@ -194,6 +280,9 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         if (confirma == JOptionPane.YES_OPTION) {
             String sql = "delete from tbusuarios where iduser=?";
             try {
+                if (conexao == null || conexao.isClosed()) {
+                    conexao = Moduloconexao.conector();
+                }
                 pst = conexao.prepareStatement(sql);
                 pst.setInt(1, userId);
                 int apagado = pst.executeUpdate();
@@ -204,6 +293,8 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                     txtUsuFone.setText(null);
                     txtUsuLogin.setText(null);
                     txtUsuSenha.setText(null);
+                    btnUsuCreate.setEnabled(true);
+                    pesquisarUsuario();
                     txtUsuId.requestFocus();
                 }
 
@@ -225,6 +316,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel8 = new javax.swing.JLabel();
+        lblIconPesquisar = new javax.swing.JLabel();
+        txtUsuPesquisar = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblUsuarios = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -240,7 +336,6 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         btnUsuUpdate = new javax.swing.JButton();
         btnUsuDelete = new javax.swing.JButton();
         btnUsuNovo = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
         jLabel7 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         txtUsuFone = new javax.swing.JFormattedTextField();
@@ -250,8 +345,38 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         setMaximizable(true);
         setResizable(true);
         setTitle("Usuários");
-        setMinimumSize(new java.awt.Dimension(640, 480));
-        setPreferredSize(new java.awt.Dimension(640, 480));
+        setMinimumSize(new java.awt.Dimension(640, 530));
+        setPreferredSize(new java.awt.Dimension(640, 530));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel8.setText("Pesquisar Usuário por Nome");
+
+        lblIconPesquisar
+                .setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/dftech/icons/pesquisar.png"))); // NOI18N
+
+        txtUsuPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtUsuPesquisarKeyReleased(evt);
+            }
+        });
+
+        tblUsuarios.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][] {},
+                new String[] {
+                        "ID", "Nome", "Fone", "Login", "Perfil"
+                }));
+        tblUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tblUsuarios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblUsuariosMouseClicked(evt);
+            }
+        });
+        tblUsuarios.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tblUsuariosKeyReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblUsuarios);
 
         jLabel2.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
         jLabel2.setText("* Nome");
@@ -380,41 +505,55 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(40, 40, 40)
+                                .addGap(25, 25, 25)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel7)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(txtUsuId, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(btnUsuNovo, javax.swing.GroupLayout.PREFERRED_SIZE, 120,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(50, 50, Short.MAX_VALUE)
-                                                .addComponent(jLabel1))
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 574,
+                                                Short.MAX_VALUE)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel8)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(txtUsuPesquisar,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 300,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(lblIconPesquisar)))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(jLabel1))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(15, 15, 15)
+                                                .addGroup(layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jLabel7)
                                                         .addComponent(jLabel2)
                                                         .addComponent(jLabel6)
                                                         .addComponent(jLabel4))
                                                 .addGap(18, 18, 18)
                                                 .addGroup(layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(txtUsuId,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 50,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(btnUsuNovo,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 120,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
                                                         .addComponent(txtUsuNome, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                420, Short.MAX_VALUE)
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addGroup(layout.createParallelGroup(
-                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        javax.swing.GroupLayout.Alignment.LEADING,
+                                                                        false)
                                                                         .addComponent(txtUsuFone,
                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                110,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                        .addComponent(txtUsuSenha,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                150,
-                                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                .addGap(25, 25, 25)
+                                                                                130, Short.MAX_VALUE)
+                                                                        .addComponent(txtUsuSenha))
+                                                                .addGap(30, 30, 30)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.TRAILING)
                                                                         .addComponent(jLabel3)
@@ -422,12 +561,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                                                 .addGap(18, 18, 18)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addComponent(txtUsuLogin,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                180, Short.MAX_VALUE)
-                                                                        .addComponent(cboUsuPerfil, 0, 180,
+                                                                        .addComponent(txtUsuLogin)
+                                                                        .addComponent(cboUsuPerfil, 0, 195,
                                                                                 Short.MAX_VALUE)))
                                                         .addGroup(layout.createSequentialGroup()
+                                                                .addGap(20, 20, 20)
                                                                 .addGroup(layout.createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.CENTER)
                                                                         .addComponent(btnUsuCreate,
@@ -471,11 +609,27 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 80,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                                .addGap(40, 40, 40)));
+                                .addGap(25, 25, 25)));
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGap(30, 30, 30)
+                                .addGap(15, 15, 15)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel8)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                        .addComponent(txtUsuPesquisar,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(lblIconPesquisar)))
+                                        .addComponent(jLabel1))
+                                .addGap(10, 10, 10)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 110,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(15, 15, 15)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel7)
                                         .addComponent(txtUsuId, javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -483,15 +637,14 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnUsuNovo, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel1))
-                                .addGap(25, 25, 25)
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(15, 15, 15)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel2)
                                         .addComponent(txtUsuNome, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(25, 25, 25)
+                                .addGap(15, 15, 15)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel6)
                                         .addComponent(txtUsuFone, javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -501,7 +654,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                         .addComponent(txtUsuLogin, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(25, 25, 25)
+                                .addGap(15, 15, 15)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel4)
                                         .addComponent(txtUsuSenha, javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -511,7 +664,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                         .addComponent(cboUsuPerfil, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(35, 35, 35)
+                                .addGap(20, 20, 20)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(btnUsuCreate, javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -539,8 +692,20 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                                                 .addComponent(lblUsuDelete)))
                                 .addContainerGap(20, Short.MAX_VALUE)));
 
-        setBounds(0, 0, 640, 480);
+        setBounds(0, 0, 640, 530);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtUsuPesquisarKeyReleased(java.awt.event.KeyEvent evt) {
+        pesquisarUsuario();
+    }
+
+    private void tblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {
+        setarCampos();
+    }
+
+    private void tblUsuariosKeyReleased(java.awt.event.KeyEvent evt) {
+        setarCampos();
+    }
 
     private void btnUsuDeleteActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnUsuDeleteActionPerformed
         remover();
@@ -613,7 +778,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel lblIconPesquisar;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblUsuarios;
+    private javax.swing.JTextField txtUsuPesquisar;
     private javax.swing.JLabel lblUsuConsulta;
     private javax.swing.JLabel lblUsuCreate;
     private javax.swing.JLabel lblUsuDelete;
